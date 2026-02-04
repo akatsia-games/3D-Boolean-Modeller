@@ -1,0 +1,85 @@
+#ifndef __OBJECT3D__
+#define __OBJECT3D__
+
+#include<vector>
+#include"Vertex.hpp"
+#include"Face.hpp"
+#include"Bound.hpp"
+
+class Solid;
+class Point3f;
+class Face;
+class Segment;
+class Colour3f;
+
+/**
+ * Data structure about a 3d solid to apply bool operations in it.
+ * 
+ * <br><br>Tipically, two 'Object3d' objects are created to apply bool operation. The
+ * methods splitFaces() and classifyFaces() are called in this sequence for both objects,
+ * always using the other one as parameter. Then the faces from both objects are collected
+ * according their status.
+ * 
+ * <br><br>See: 
+ * D. H. Laidlaw, W. B. Trumbore, and J. F. Hughes.  
+ * "Constructive Solid Geometry for Polyhedral Objects" 
+ * SIGGRAPH Proceedings, 1986, p.161. 
+ *  
+ * @author Danilo Balby Silva Castanheira (danbalby@yahoo.com)
+ * Translated to C++ by akatsia-games on github.com
+ */
+class Object3D
+{
+public:
+
+	Object3D(Solid solid);
+
+	Object3D(Object3D& other);
+
+	int getNumFaces();
+
+	Face getFace(int index);
+
+	Bound getBound();
+
+	void splitFaces(Object3D object);
+
+	void classifyFaces(Object3D object);
+
+private:
+
+	Face addFace(Vertex v1, Vertex v2, Vertex v3);
+
+	Vertex addVertex(Point3f pos, Colour3f color, int status);
+
+	double computeDistance(Vertex vertex, Face face);
+
+	void splitFace(int facePos, Segment segment1, Segment segment2);
+
+	void breakFaceInTwo(int facePos, Point3f newPos, int splitEdge);
+
+	void breakFaceInTwo(int facePos, Point3f newPos, Vertex endVertex);
+
+	void breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, int splitEdge);
+
+	void breakFaceInThree(int facePos, Point3f newPos, Vertex endVertex);
+
+	void breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, Vertex startVertex, Vertex endVertex);
+
+	void breakFaceInThree(int facePos, Point3f newPos);
+
+	void breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Vertex endVertex);
+
+	void breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, int linedVertex);
+	
+	/** solid vertices  */
+	std::vector<Vertex> vertices;
+	/** solid faces */
+	std::vector<Face> faces;
+	/** object representing the solid extremes */
+	Bound bound;
+	
+	/** tolerance value to test equalities */
+	constexpr static const double TOL = 1e-10f;
+};
+#endif //__OBJECT3D__

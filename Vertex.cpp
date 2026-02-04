@@ -1,0 +1,229 @@
+#include "Vertex.hpp"
+#include <algorithm>
+
+/** 
+ * Represents of a 3d face vertex.
+ * 
+ * <br><br>See: 
+ * D. H. Laidlaw, W. B. Trumbore, and J. F. Hughes.  
+ * "Constructive Solid Geometry for Polyhedral Objects" 
+ * SIGGRAPH Proceedings, 1986, p.161. 
+ * 
+ * @author Danilo Balby Silva Castanheira (danbalby@yahoo.com)
+ * Translated to C++ by akatsia-games on github.com
+ */
+
+/**
+ * Constructs a vertex with unknown status
+ * 
+ * @param position vertex position
+ * @param color vertex color
+ */
+Vertex::Vertex(Point3f position, Colour3f color)
+{
+	this->color = color;
+	
+	x = position.x;
+	y = position.y;
+	z = position.z;
+	
+	status = UNKNOWN;
+}
+
+/**
+ * Constructs a vertex with unknown status
+ * 
+ * @param x coordinate on the x axis
+ * @param y coordinate on the y axis
+ * @param z coordinate on the z axis
+ * @param color vertex color
+ */
+Vertex::Vertex(double x, double y, double z, Colour3f color)
+{
+	this->color = color;
+			
+	this->x = x;
+	this->y = y;
+	this->z = z;
+	
+	status = UNKNOWN;
+}
+
+/**
+ * Constructs a vertex with definite status
+ * 
+ * @param position vertex position
+ * @param color vertex color
+ * @param status vertex status - UNKNOWN, BOUNDARY, INSIDE or OUTSIDE
+ */
+Vertex::Vertex(Point3f position, Colour3f color, int status)
+{
+	this->color = color;
+	
+	x = position.x;
+	y = position.y;
+	z = position.z;
+	
+	this->status = status;
+}
+
+/**
+ * Constructs a vertex with a definite status
+ * 
+ * @param x coordinate on the x axis
+ * @param y coordinate on the y axis
+ * @param z coordinate on the z axis
+ * @param color vertex color
+ * @param status vertex status - UNKNOWN, BOUNDARY, INSIDE or OUTSIDE
+ */
+Vertex::Vertex(double x, double y, double z, Colour3f color, int status)
+{
+	this->color = color;
+	
+	this->x = x;
+	this->y = y;
+	this->z = z;
+	
+	this->status = status;
+}
+
+//-----------------------------------OVERRIDES----------------------------------//
+
+/**
+ * Clones the vertex object
+ * 
+ * @return cloned vertex object
+ */
+Vertex::Vertex(const Vertex& other)
+{
+	x = other.x;
+	y = other.y;
+	z = other.z;
+	color = other.color;
+	status = other.status;
+	adjacentVertices = other.adjacentVertices;
+}
+
+/**
+ * Create invalid vertex object
+ */
+Vertex::Vertex()
+{
+	status = INVALID;
+}
+
+/**
+ * Makes a string definition for the Vertex object
+ * 
+ * @return the string definition
+ */
+std::string Vertex::toString() const
+{
+	return "("+std::to_string(x)+", "+std::to_string(y)+", "+std::to_string(z)+")";
+}
+
+/**
+ * Checks if an vertex is equal to another. To be equal, they have to have the same
+ * coordinates(with some tolerance) and color
+ * 
+ * @param anObject the other vertex to be tested
+ * @return true if they are equal, false otherwise. 
+ */
+bool Vertex::equals(const Vertex& other) const
+{
+	return 	abs(x-other.x)<TOL && abs(y-other.y)<TOL 
+			&& abs(z-other.z)<TOL && color.equals(other.color);
+}
+
+//--------------------------------------SETS------------------------------------//
+	
+/**
+ * Sets the vertex status
+ * 
+ * @param status vertex status - UNKNOWN, BOUNDARY, INSIDE or OUTSIDE
+ */
+void Vertex::setStatus(int status)
+{
+	if(status>=UNKNOWN && status<=BOUNDARY)
+	{
+		this->status = status;	
+	}
+}
+
+//--------------------------------------GETS------------------------------------//
+
+/**
+ * Gets the vertex position
+ * 
+ * @return vertex position
+ */
+Point3f Vertex::getPosition() const
+{
+	return {(float)x, (float)y, (float)z};
+} 
+
+/**
+ * Gets an array with the adjacent vertices
+ * 
+ * @return array of the adjacent vertices 
+ */
+const std::vector<Vertex*>& Vertex::getAdjacentVertices() const
+{
+	return adjacentVertices;
+}
+
+/**
+ * Gets the vertex status
+ * 
+ * @return vertex status - UNKNOWN, BOUNDARY, INSIDE or OUTSIDE
+ */	
+int Vertex::getStatus() const
+{
+	return status;
+}
+
+/**
+ * Gets the vertex color
+ * 
+ * @return vertex color
+ */
+Colour3f Vertex::getColor() const
+{
+	return color;
+}
+
+//----------------------------------OTHERS--------------------------------------//
+
+/**
+ * Sets a vertex as being adjacent to it
+ * 
+ * @param adjacentVertex an adjacent vertex
+ */
+void Vertex::addAdjacentVertex(Vertex* adjacentVertex)
+{
+	if(std::find(adjacentVertices.begin(),adjacentVertices.end(),
+		[adjacentVertex](Vertex* curr_vertex){return curr_vertex==adjacentVertex;}) == adjacentVertices.end())
+	{
+		adjacentVertices.push_back(adjacentVertex);
+	} 
+}
+
+/**
+ * Sets the vertex status, setting equally the adjacent ones
+ * 
+ * @param status new status to be set
+ */
+void Vertex::mark(int status)
+{
+	//mark vertex
+	this->status = status;
+	
+	//mark adjacent vertices
+	for(auto adjVertexPtr : adjacentVertices)
+	{
+		if(adjVertexPtr->getStatus()==Vertex::UNKNOWN)
+		{
+			adjVertexPtr->mark(status);
+		}
+	}
+}

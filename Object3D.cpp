@@ -27,7 +27,7 @@
  *
  * @param solid solid used to construct the Object3d object  
  */	
-Object3D::Object3D(Solid solid)
+Object3D::Object3D(const Solid& solid)
 {
 	Vertex v1, v2, v3, vertex;
 	std::vector<Point3f> verticesPoints = solid.getVertices();

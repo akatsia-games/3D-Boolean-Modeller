@@ -5,6 +5,9 @@
 #include"Face.hpp"
 #include"Segment.hpp"
 
+
+const Face nullFace;
+
 /**
  * Data structure about a 3d solid to apply bool operations in it.
  * 
@@ -28,33 +31,33 @@
  * @param solid solid used to construct the Object3d object  
  */	
 Object3D::Object3D(const Solid& solid)
+	:bound(solid.getVertices())
 {
 	Vertex v1, v2, v3, vertex;
-	std::vector<Point3f> verticesPoints = solid.getVertices();
-	std::vector<int> indices = solid.getIndices();
-	std::vector<Colour3f> colors = solid.getColors();
-	ArrayList verticesTemp = new ArrayList();
+	const std::vector<Point3f>& verticesPoints = solid.getVertices();
+	const std::vector<int>& indices = solid.getIndices();
+	const std::vector<Colour3f>& colors = solid.getColors();
+	std::vector<Vertex> verticesTemp;
 	
 	//create vertices
-	vertices = new ArrayList();
-	for(int i=0;i<verticesPoints.length;i++)
+	vertices.resize(0);
+	vertices.reserve(verticesPoints.size());
+	for(int i=0;i<verticesPoints.size();i++)
 	{
-		vertex = addVertex(verticesPoints[i], colors[i], Vertex.UNKNOWN);
-		verticesTemp.add(vertex); 
+		vertex = addVertex(verticesPoints[i], colors[i], Vertex::UNKNOWN);
+		verticesTemp.push_back(vertex); 
 	}
 	
 	//create faces
-	faces = new ArrayList();
-	for(int i=0; i<indices.length; i=i+3)
+	faces.resize(0);
+	faces.reserve(((indices.size()-1)/3)+1); //indices.size / 3 rounded up
+	for(int i=0; i<indices.size(); i=i+3)
 	{
-		v1 = (Vertex)verticesTemp.get(indices[i]);
-		v2 = (Vertex)verticesTemp.get(indices[i+1]);
-		v3 = (Vertex)verticesTemp.get(indices[i+2]);
+		v1 = (Vertex)verticesTemp[indices[i]];
+		v2 = (Vertex)verticesTemp[indices[i+1]];
+		v3 = (Vertex)verticesTemp[indices[i+2]];
 		addFace(v1, v2, v3);
 	}
-	
-	//create bound
-	bound = new Bound(verticesPoints);
 }
 
 //-----------------------------------OVERRIDES----------------------------------//
@@ -64,29 +67,11 @@ Object3D::Object3D(const Solid& solid)
  * 
  * @return cloned Object3D object
  */
-Object Object3D::clone()
+Object3D::Object3D(const Object3D& other)
+	:vertices(other.vertices)
+	,faces(other.faces)
+	,bound(other.bound)
 {
-	try
-	{
-		Object3D clone = (Object3D)super.clone();
-		clone.vertices = new ArrayList();
-		for(int i=0;i<vertices.size();i++)
-		{
-			clone.vertices.add(((Vertex)vertices.get(i)).clone());
-		}
-		clone.faces = new ArrayList();
-		for(int i=0;i<vertices.size();i++)
-		{
-			clone.faces.add(((Face)faces.get(i)).clone());
-		}
-		clone.bound = bound;
-		
-		return clone;
-	}
-	catch(CloneNotSupportedException e)
-	{	
-		return null;
-	}
 }
 
 //--------------------------------------GETS------------------------------------//
@@ -107,15 +92,15 @@ int Object3D::getNumFaces()
  * @param index required face position
  * @return face reference , null if the position is invalid
  */
-Face Object3D::getFace(int index)
+const Face& Object3D::getFace(int index) const
 {
 	if(index<0 || index>=faces.size())
 	{
-		return null;
+		return nullFace;
 	}
 	else
 	{
-		return (Face)faces.get(index);
+		return faces[index];
 	}
 }
 
@@ -124,7 +109,7 @@ Face Object3D::getFace(int index)
  * 
  * @return solid bound
  */
-Bound Object3D::getBound()
+const Bound& Object3D::getBound()const
 {
 	return bound;
 }
@@ -138,24 +123,29 @@ Bound Object3D::getBound()
  * @param v2 a face vertex
  * @param v3 a face vertex
  */
-Face Object3D::addFace(Vertex v1, Vertex v2, Vertex v3)
+const Face& Object3D::addFace(Vertex v1, Vertex v2, Vertex v3, int emplace)
 {
 	if(!(v1.equals(v2)||v1.equals(v3)||v2.equals(v3)))
 	{
-		Face face = new Face(v1, v2, v3);
+		Face face(v1, v2, v3);
 		if(face.getArea()>TOL)
-		{		 
-			faces.add(face);
-			return face;
+		{
+			if(emplace == -1){
+				faces.push_back(face);
+				return faces.back();
+			}else{
+				faces[emplace] = face;
+				return faces[emplace];
+			}
 		}
 		else
 		{
-			return null;
+			return nullFace;
 		}
 	}
 	else
 	{
-		return null;
+		return nullFace;
 	}
 }
 
@@ -167,25 +157,25 @@ Face Object3D::addFace(Vertex v1, Vertex v2, Vertex v3)
  * @param status vertex status
  * @return the vertex inserted (if a similar vertex already exists, this is returned)
  */
-Vertex Object3D::addVertex(Point3f pos, Colour3f color, int status)
+const Vertex& Object3D::addVertex(Point3f pos, Colour3f color, int status, int& index)
 {
 	int i;
 	//if already there is an equal vertex, it is not inserted
-	Vertex vertex = new Vertex(pos, color, status);
+	Vertex vertex(pos, color, status);
 	for(i=0;i<vertices.size();i++)
 	{
-		if(vertex.equals(vertices.get(i))) break;			
+		if(vertex.equals(vertices[i])) break;			
 	}
+	index = i;
 	if(i==vertices.size())
 	{
-		vertices.add(vertex);
-		return vertex;
+		vertices.push_back(vertex);
+		return vertices.back();
 	}
 	else
 	{
-		vertex = (Vertex)vertices.get(i);
-		vertex.setStatus(status);
-		return vertex;
+		vertices[i].setStatus(status);
+		return vertices[i];
 	}
 	
 }
@@ -200,7 +190,6 @@ Vertex Object3D::addVertex(Point3f pos, Colour3f color, int status)
 void Object3D::splitFaces(Object3D object)
 {
 	Line line;
-	Face face1, face2;
 	std::vector<Segment> segments;
 	Segment segment1, segment2;
 	double distFace1Vert1, distFace1Vert2, distFace1Vert3, distFace2Vert1, distFace2Vert2, distFace2Vert3;
@@ -216,7 +205,7 @@ void Object3D::splitFaces(Object3D object)
 		for(int i=0;i<getNumFaces();i++)
 		{
 			//if object1 face bound and object2 bound overlap ...
-			face1 = getFace(i);
+			const Face face1 = getFace(i);
 			
 			if(face1.getBound().overlap(object.getBound()))
 			{
@@ -224,7 +213,7 @@ void Object3D::splitFaces(Object3D object)
 				for(int j=0;j<object.getNumFaces();j++)
 				{
 					//if object1 face bound and object2 face bound overlap...  
-					face2 = object.getFace(j);
+					const Face& face2 = object.getFace(j);
 					if(face1.getBound().overlap(face2.getBound()))
 					{
 						//PART I - DO TWO POLIGONS INTERSECT?
@@ -258,13 +247,13 @@ void Object3D::splitFaces(Object3D object)
 							//if the signs are not equal...
 							if (!(signFace2Vert1==signFace2Vert2 && signFace2Vert2==signFace2Vert3))
 							{
-								line = new Line(face1, face2);
+								line = Line(face1, face2);
 						
 								//intersection of the face1 and the plane of face2
-								segment1 = new Segment(line, face1, signFace1Vert1, signFace1Vert2, signFace1Vert3);
+								segment1 = Segment(line, face1, signFace1Vert1, signFace1Vert2, signFace1Vert3);
 																
 								//intersection of the face2 and the plane of face1
-								segment2 = new Segment(line, face2, signFace2Vert1, signFace2Vert2, signFace2Vert3);
+								segment2 = Segment(line, face2, signFace2Vert1, signFace2Vert2, signFace2Vert3);
 															
 								//if the two segments intersect...
 								if(segment1.intersect(segment2))
@@ -281,25 +270,11 @@ void Object3D::splitFaces(Object3D object)
 									//}
 							
 									//if the face in the position isn't the same, there was a break 
-									if(face1!=getFace(i)) 
+									if(face1 != getFace(i)) 
 									{
-										//if the generated solid is equal the origin...
-										if(face1.equals(getFace(getNumFaces()-1)))
-										{
-											//return it to its position and jump it
-											if(i!=(getNumFaces()-1))
-											{
-												faces.remove(getNumFaces()-1);
-												faces.add(i, face1);
-											}
-											else
-											{
-												continue;
-											}
-										}
-										//else: test next face
-										else
-										{
+										//if the generated solid isn't equal the origin...
+										if(!face1.equals(getFace(getNumFaces()-1)))
+										{//test next face
 											i--;
 											break;
 										}
@@ -321,7 +296,7 @@ void Object3D::splitFaces(Object3D object)
  * @param face face representing the plane where it is contained
  * @return the closest distance from the vertex to the plane
  */
-double Object3D::computeDistance(Vertex vertex, Face face)
+double Object3D::computeDistance(const Vertex& vertex, const Face& face) const
 {
 	Vector3f normal = face.getNormal();
 	double a = normal.x;
@@ -381,33 +356,33 @@ void Object3D::splitFace(int facePos, Segment segment1, Segment segment2)
 	middleType = segment1.getIntermediateType();
 	
 	//set vertex to BOUNDARY if it is start type		
-	if (startType == Segment.VERTEX)
+	if (startType == Segment::VERTEX)
 	{
-		startVertex.setStatus(Vertex.BOUNDARY);
+		startVertex.setStatus(Vertex::BOUNDARY);
 	}
 			
 	//set vertex to BOUNDARY if it is end type
-	if (endType == Segment.VERTEX)
+	if (endType == Segment::VERTEX)
 	{
-		endVertex.setStatus(Vertex.BOUNDARY);
+		endVertex.setStatus(Vertex::BOUNDARY);
 	}
 	
 	//VERTEX-_______-VERTEX 
-	if (startType == Segment.VERTEX && endType == Segment.VERTEX)
+	if (startType == Segment::VERTEX && endType == Segment::VERTEX)
 	{
 		return;
 	}
 	
 	//______-EDGE-______
-	else if (middleType == Segment.EDGE)
+	else if (middleType == Segment::EDGE)
 	{
 		//gets the edge 
 		int splitEdge;
-		if ((startVertex == face.v1 && endVertex == face.v2) || (startVertex == face.v2 && endVertex == face.v1))
+		if ((startVertex.equals(face.v1) && endVertex.equals(face.v2)) || (startVertex.equals(face.v2) && endVertex.equals(face.v1)))
 		{
 			splitEdge = 1;
 		}
-		else if ((startVertex == face.v2 && endVertex == face.v3) || (startVertex == face.v3 && endVertex == face.v2))
+		else if ((startVertex.equals(face.v2) && endVertex.equals(face.v3)) || (startVertex.equals(face.v3) && endVertex.equals(face.v2)))
 		{	  
 			splitEdge = 2; 
 		} 
@@ -417,14 +392,14 @@ void Object3D::splitFace(int facePos, Segment segment1, Segment segment2)
 		} 
 		
 		//VERTEX-EDGE-EDGE
-		if (startType == Segment.VERTEX)
+		if (startType == Segment::VERTEX)
 		{
 			breakFaceInTwo(facePos, endPos, splitEdge);
 			return;
 		}
 		
 		//EDGE-EDGE-VERTEX
-		else if (endType == Segment.VERTEX)
+		else if (endType == Segment::VERTEX)
 		{
 			breakFaceInTwo(facePos, startPos, splitEdge);
 			return;
@@ -437,7 +412,7 @@ void Object3D::splitFace(int facePos, Segment segment1, Segment segment2)
 		}
 		else
 		{
-			if((startVertex == face.v1 && endVertex == face.v2) || (startVertex == face.v2 && endVertex == face.v3) || (startVertex == face.v3 && endVertex == face.v1))
+			if((startVertex.equals(face.v1) && endVertex.equals(face.v2)) || (startVertex.equals(face.v2) && endVertex.equals(face.v3)) || (startVertex.equals(face.v3) && endVertex.equals(face.v1)))
 			{
 				breakFaceInThree(facePos, startPos, endPos, splitEdge);
 			}
@@ -452,47 +427,47 @@ void Object3D::splitFace(int facePos, Segment segment1, Segment segment2)
 	//______-FACE-______
 	
 	//VERTEX-FACE-EDGE
-	else if (startType == Segment.VERTEX && endType == Segment.EDGE)
+	else if (startType == Segment::VERTEX && endType == Segment::EDGE)
 	{
 		breakFaceInTwo(facePos, endPos, endVertex);
 	}
 	//EDGE-FACE-VERTEX
-	else if (startType == Segment.EDGE && endType == Segment.VERTEX)
+	else if (startType == Segment::EDGE && endType == Segment::VERTEX)
 	{
 		breakFaceInTwo(facePos, startPos, startVertex);
 	}
 	//VERTEX-FACE-FACE
-	else if (startType == Segment.VERTEX && endType == Segment.FACE)
+	else if (startType == Segment::VERTEX && endType == Segment::FACE)
 	{
 		breakFaceInThree(facePos, endPos, startVertex);
 	}
 	//FACE-FACE-VERTEX
-	else if (startType == Segment.FACE && endType == Segment.VERTEX)
+	else if (startType == Segment::FACE && endType == Segment::VERTEX)
 	{
 		breakFaceInThree(facePos, startPos, endVertex);
 	}
 	//EDGE-FACE-EDGE
-	else if (startType == Segment.EDGE && endType == Segment.EDGE)
+	else if (startType == Segment::EDGE && endType == Segment::EDGE)
 	{
 		breakFaceInThree(facePos, startPos, endPos, startVertex, endVertex);
 	}
 	//EDGE-FACE-FACE
-	else if (startType == Segment.EDGE && endType == Segment.FACE)
+	else if (startType == Segment::EDGE && endType == Segment::FACE)
 	{
 		breakFaceInFour(facePos, startPos, endPos, startVertex);
 	}
 	//FACE-FACE-EDGE
-	else if (startType == Segment.FACE && endType == Segment.EDGE)
+	else if (startType == Segment::FACE && endType == Segment::EDGE)
 	{
 		breakFaceInFour(facePos, endPos, startPos, endVertex);
 	}
 	//FACE-FACE-FACE
-	else if (startType == Segment.FACE && endType == Segment.FACE)
+	else if (startType == Segment::FACE && endType == Segment::FACE)
 	{
-		Vector3f segmentVector = new Vector3f(startPos.x-endPos.x, startPos.y-endPos.y, startPos.z-endPos.z);
+		Vector3f segmentVector({startPos.x-endPos.x, startPos.y-endPos.y, startPos.z-endPos.z});
 					
 		//if the intersection segment is a point only...
-		if (Math.abs(segmentVector.x)<TOL && Math.abs(segmentVector.y)<TOL && Math.abs(segmentVector.z)<TOL)
+		if (abs(segmentVector.x)<TOL && abs(segmentVector.y)<TOL && abs(segmentVector.z)<TOL)
 		{
 			breakFaceInThree(facePos, startPos);
 			return;
@@ -501,15 +476,15 @@ void Object3D::splitFace(int facePos, Segment segment1, Segment segment2)
 		//gets the vertex more lined with the intersection segment
 		int linedVertex;
 		Point3f linedVertexPos;
-		Vector3f vertexVector = new Vector3f(endPos.x-face.v1.x, endPos.y-face.v1.y, endPos.z-face.v1.z);
+		Vector3f   vertexVector({(float)(endPos.x-face.v1.x), (float)(endPos.y-face.v1.y), (float)(endPos.z-face.v1.z)});
 		vertexVector.normalize();
-		double dot1 = Math.abs(segmentVector.dot(vertexVector));
-		vertexVector = new Vector3f(endPos.x-face.v2.x, endPos.y-face.v2.y, endPos.z-face.v2.z);
+		double dot1 = abs(segmentVector.dot(vertexVector));
+		vertexVector = Vector3f({(float)(endPos.x-face.v2.x), (float)(endPos.y-face.v2.y), (float)(endPos.z-face.v2.z)});
 		vertexVector.normalize();
-		double dot2 = Math.abs(segmentVector.dot(vertexVector));
-		vertexVector = new Vector3f(endPos.x-face.v3.x, endPos.y-face.v3.y, endPos.z-face.v3.z);
+		double dot2 = abs(segmentVector.dot(vertexVector));
+		vertexVector = Vector3f({(float)(endPos.x-face.v3.x), (float)(endPos.y-face.v3.y), (float)(endPos.z-face.v3.z)});
 		vertexVector.normalize();
-		double dot3 = Math.abs(segmentVector.dot(vertexVector));
+		double dot3 = abs(segmentVector.dot(vertexVector));
 		if (dot1 > dot2 && dot1 > dot3)
 		{
 			linedVertex = 1;
@@ -547,24 +522,23 @@ void Object3D::splitFace(int facePos, Segment segment1, Segment segment2)
  */		
 void Object3D::breakFaceInTwo(int facePos, Point3f newPos, int splitEdge)
 {
-	Face face = (Face)faces.get(facePos);
-	faces.remove(facePos);
+	Face face = faces[facePos];
 	
-	Vertex vertex = addVertex(newPos, face.v1.getColor(), Vertex.BOUNDARY); 
+	Vertex vertex = addVertex(newPos, face.v1.getColor(), Vertex::BOUNDARY); 
 					
 	if (splitEdge == 1)
 	{
-		addFace(face.v1, vertex, face.v3);
+		addFace(face.v1, vertex, face.v3, facePos);
 		addFace(vertex, face.v2, face.v3);
 	}
 	else if (splitEdge == 2)
 	{
-		addFace(face.v2, vertex, face.v1);
+		addFace(face.v2, vertex, face.v1, facePos);
 		addFace(vertex, face.v3, face.v1);
 	}
 	else
 	{
-		addFace(face.v3, vertex, face.v2);
+		addFace(face.v3, vertex, face.v2, facePos);
 		addFace(vertex, face.v1, face.v2);
 	}
 }
@@ -578,24 +552,23 @@ void Object3D::breakFaceInTwo(int facePos, Point3f newPos, int splitEdge)
  */		
 void Object3D::breakFaceInTwo(int facePos, Point3f newPos, Vertex endVertex)
 {
-	Face face = (Face)faces.get(facePos);
-	faces.remove(facePos);
+	Face face = faces[facePos];
 	
-	Vertex vertex = addVertex(newPos, face.v1.getColor(), Vertex.BOUNDARY);
+	Vertex vertex = addVertex(newPos, face.v1.getColor(), Vertex::BOUNDARY);
 				
 	if (endVertex.equals(face.v1))
 	{
-		addFace(face.v1, vertex, face.v3);
+		addFace(face.v1, vertex, face.v3, facePos);
 		addFace(vertex, face.v2, face.v3);
 	}
 	else if (endVertex.equals(face.v2))
 	{
-		addFace(face.v2, vertex, face.v1);
+		addFace(face.v2, vertex, face.v1, facePos);
 		addFace(vertex, face.v3, face.v1);
 	}
 	else
 	{
-		addFace(face.v3, vertex, face.v2);
+		addFace(face.v3, vertex, face.v2, facePos);
 		addFace(vertex, face.v1, face.v2);
 	}
 }
@@ -610,27 +583,26 @@ void Object3D::breakFaceInTwo(int facePos, Point3f newPos, Vertex endVertex)
  */
 void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, int splitEdge)
 {
-	Face face = (Face)faces.get(facePos);
-	faces.remove(facePos);
+	Face face = faces[facePos];
 	
-	Vertex vertex1 = addVertex(newPos1, face.v1.getColor(), Vertex.BOUNDARY);	
-	Vertex vertex2 = addVertex(newPos2, face.v1.getColor(), Vertex.BOUNDARY);
+	Vertex vertex1 = addVertex(newPos1, face.v1.getColor(), Vertex::BOUNDARY);	
+	Vertex vertex2 = addVertex(newPos2, face.v1.getColor(), Vertex::BOUNDARY);
 					
 	if (splitEdge == 1)
 	{
-		addFace(face.v1, vertex1, face.v3);
+		addFace(face.v1, vertex1, face.v3, facePos);
 		addFace(vertex1, vertex2, face.v3);
 		addFace(vertex2, face.v2, face.v3);
 	}
 	else if (splitEdge == 2)
 	{
-		addFace(face.v2, vertex1, face.v1);
+		addFace(face.v2, vertex1, face.v1, facePos);
 		addFace(vertex1, vertex2, face.v1);
 		addFace(vertex2, face.v3, face.v1);
 	}
 	else
 	{
-		addFace(face.v3, vertex1, face.v2);
+		addFace(face.v3, vertex1, face.v2, facePos);
 		addFace(vertex1, vertex2, face.v2);
 		addFace(vertex2, face.v1, face.v2);
 	}
@@ -645,26 +617,25 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, i
  */
 void Object3D::breakFaceInThree(int facePos, Point3f newPos, Vertex endVertex)
 {
-	Face face = (Face)faces.get(facePos);
-	faces.remove(facePos);
+	Face face = faces[facePos];
 	
-	Vertex vertex = addVertex(newPos, face.v1.getColor(), Vertex.BOUNDARY);
+	Vertex vertex = addVertex(newPos, face.v1.getColor(), Vertex::BOUNDARY);
 					
 	if (endVertex.equals(face.v1))
 	{
-		addFace(face.v1, face.v2, vertex);
+		addFace(face.v1, face.v2, vertex, facePos);
 		addFace(face.v2, face.v3, vertex);
 		addFace(face.v3, face.v1, vertex);
 	}
 	else if (endVertex.equals(face.v2))
 	{
-		addFace(face.v2, face.v3, vertex);
+		addFace(face.v2, face.v3, vertex, facePos);
 		addFace(face.v3, face.v1, vertex);
 		addFace(face.v1, face.v2, vertex);
 	}
 	else
 	{
-		addFace(face.v3, face.v1, vertex);
+		addFace(face.v3, face.v1, vertex, facePos);
 		addFace(face.v1, face.v2, vertex);
 		addFace(face.v2, face.v3, vertex);
 	}
@@ -681,45 +652,44 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos, Vertex endVertex)
  */
 void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, Vertex startVertex, Vertex endVertex)
 {
-	Face face = (Face)faces.get(facePos);
-	faces.remove(facePos);
+	Face face = faces[facePos];
 	
-	Vertex vertex1 = addVertex(newPos1, face.v1.getColor(), Vertex.BOUNDARY);
-	Vertex vertex2 = addVertex(newPos2, face.v1.getColor(), Vertex.BOUNDARY);
+	Vertex vertex1 = addVertex(newPos1, face.v1.getColor(), Vertex::BOUNDARY);
+	Vertex vertex2 = addVertex(newPos2, face.v1.getColor(), Vertex::BOUNDARY);
 					
 	if (startVertex.equals(face.v1) && endVertex.equals(face.v2))
 	{
-		addFace(face.v1, vertex1, vertex2);
+		addFace(face.v1, vertex1, vertex2, facePos);
 		addFace(face.v1, vertex2, face.v3);
 		addFace(vertex1, face.v2, vertex2);
 	}
 	else if (startVertex.equals(face.v2) && endVertex.equals(face.v1))
 	{
-		addFace(face.v1, vertex2, vertex1);
+		addFace(face.v1, vertex2, vertex1, facePos);
 		addFace(face.v1, vertex1, face.v3);
 		addFace(vertex2, face.v2, vertex1);
 	}
 	else if (startVertex.equals(face.v2) && endVertex.equals(face.v3))
 	{
-		addFace(face.v2, vertex1, vertex2);
+		addFace(face.v2, vertex1, vertex2, facePos);
 		addFace(face.v2, vertex2, face.v1);
 		addFace(vertex1, face.v3, vertex2);
 	}
 	else if (startVertex.equals(face.v3) && endVertex.equals(face.v2))
 	{
-		addFace(face.v2, vertex2, vertex1);
+		addFace(face.v2, vertex2, vertex1, facePos);
 		addFace(face.v2, vertex1, face.v1);
 		addFace(vertex2, face.v3, vertex1);
 	}
 	else if (startVertex.equals(face.v3) && endVertex.equals(face.v1))
 	{
-		addFace(face.v3, vertex1, vertex2);
+		addFace(face.v3, vertex1, vertex2, facePos);
 		addFace(face.v3, vertex2, face.v2);
 		addFace(vertex1, face.v1, vertex2);
 	}
 	else
 	{
-		addFace(face.v3, vertex2, vertex1);
+		addFace(face.v3, vertex2, vertex1, facePos);
 		addFace(face.v3, vertex1, face.v2);
 		addFace(vertex2, face.v1, vertex1);
 	}
@@ -733,12 +703,11 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, V
  */
 void Object3D::breakFaceInThree(int facePos, Point3f newPos)
 {
-	Face face = (Face)faces.get(facePos);
-	faces.remove(facePos);
+	Face face = faces[facePos];
 	
-	Vertex vertex = addVertex(newPos, face.v1.getColor(), Vertex.BOUNDARY);
+	Vertex vertex = addVertex(newPos, face.v1.getColor(), Vertex::BOUNDARY);
 			
-	addFace(face.v1, face.v2, vertex);
+	addFace(face.v1, face.v2, vertex, facePos);
 	addFace(face.v2, face.v3, vertex);
 	addFace(face.v3, face.v1, vertex);
 }
@@ -753,29 +722,28 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos)
  */	
 void Object3D::breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Vertex endVertex)
 {
-	Face face = (Face)faces.get(facePos);
-	faces.remove(facePos);
+	Face face = faces[facePos];
 	
-	Vertex vertex1 = addVertex(newPos1, face.v1.getColor(), Vertex.BOUNDARY);
-	Vertex vertex2 = addVertex(newPos2, face.v1.getColor(), Vertex.BOUNDARY);
+	Vertex vertex1 = addVertex(newPos1, face.v1.getColor(), Vertex::BOUNDARY);
+	Vertex vertex2 = addVertex(newPos2, face.v1.getColor(), Vertex::BOUNDARY);
 	
 	if (endVertex.equals(face.v1))
 	{
-		addFace(face.v1, vertex1, vertex2);
+		addFace(face.v1, vertex1, vertex2, facePos);
 		addFace(vertex1, face.v2, vertex2);
 		addFace(face.v2, face.v3, vertex2);
 		addFace(face.v3, face.v1, vertex2);
 	}
 	else if (endVertex.equals(face.v2))
 	{
-		addFace(face.v2, vertex1, vertex2);
+		addFace(face.v2, vertex1, vertex2, facePos);
 		addFace(vertex1, face.v3, vertex2);
 		addFace(face.v3, face.v1, vertex2);
 		addFace(face.v1, face.v2, vertex2);
 	}
 	else
 	{
-		addFace(face.v3, vertex1, vertex2);
+		addFace(face.v3, vertex1, vertex2, facePos);
 		addFace(vertex1, face.v1, vertex2);
 		addFace(face.v1, face.v2, vertex2);
 		addFace(face.v2, face.v3, vertex2);
@@ -792,16 +760,15 @@ void Object3D::breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Ve
  */		
 void Object3D::breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, int linedVertex)
 {
-	Face face = (Face)faces.get(facePos);
-	faces.remove(facePos);
+	Face face = faces[facePos];
 	
-	Vertex vertex1 = addVertex(newPos1, face.v1.getColor(), Vertex.BOUNDARY);
-	Vertex vertex2 = addVertex(newPos2, face.v1.getColor(), Vertex.BOUNDARY);
+	Vertex vertex1 = addVertex(newPos1, face.v1.getColor(), Vertex::BOUNDARY);
+	Vertex vertex2 = addVertex(newPos2, face.v1.getColor(), Vertex::BOUNDARY);
 	
 	double cont = 0;		
 	if (linedVertex == 1)
 	{
-		addFace(face.v2, face.v3, vertex1);
+		addFace(face.v2, face.v3, vertex1, facePos);
 		addFace(face.v2, vertex1, vertex2);
 		addFace(face.v3, vertex2, vertex1);
 		addFace(face.v2, vertex2, face.v1);
@@ -809,7 +776,7 @@ void Object3D::breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, in
 	}
 	else if(linedVertex == 2)
 	{
-		addFace(face.v3, face.v1, vertex1);
+		addFace(face.v3, face.v1, vertex1, facePos);
 		addFace(face.v3, vertex1, vertex2);
 		addFace(face.v1, vertex2, vertex1);
 		addFace(face.v3, vertex2, face.v2);
@@ -817,7 +784,7 @@ void Object3D::breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, in
 	}
 	else
 	{
-		addFace(face.v1, face.v2, vertex1);
+		addFace(face.v1, face.v2, vertex1, facePos);
 		addFace(face.v1, vertex1, vertex2);
 		addFace(face.v2, vertex2, vertex1);
 		addFace(face.v1, vertex2, face.v3);
@@ -838,7 +805,7 @@ void Object3D::classifyFaces(Object3D object)
 	Face face;
 	for(int i=0;i<this->getNumFaces();i++)
 	{
-		face = this->getFace(i);
+		face = this->getFace(i); // this needs to be rewritten for c++
 		face.v1.addAdjacentVertex(face.v2);
 		face.v1.addAdjacentVertex(face.v3);
 		face.v2.addAdjacentVertex(face.v1);
@@ -859,15 +826,15 @@ void Object3D::classifyFaces(Object3D object)
 			face.rayTraceClassify(object);
 			
 			//mark the vertices
-			if(face.v1.getStatus()==Vertex.UNKNOWN) 
+			if(face.v1.getStatus()==Vertex::UNKNOWN) 
 			{
 				face.v1.mark(face.getStatus());
 			}
-			if(face.v2.getStatus()==Vertex.UNKNOWN) 
+			if(face.v2.getStatus()==Vertex::UNKNOWN) 
 			{
 				face.v2.mark(face.getStatus());
 			}
-			if(face.v3.getStatus()==Vertex.UNKNOWN) 
+			if(face.v3.getStatus()==Vertex::UNKNOWN) 
 			{
 				face.v3.mark(face.getStatus());
 			}
@@ -883,7 +850,7 @@ void Object3D::invertInsideFaces()
 	for(int i=0;i<getNumFaces();i++)
 	{
 		face = getFace(i);
-		if(face.getStatus()==Face.INSIDE)
+		if(face.getStatus()==Face::INSIDE)
 		{
 			face.invert();
 		}

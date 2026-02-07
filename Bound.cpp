@@ -48,6 +48,23 @@ Bound::Bound(const std::vector<Point3f>& vertices)
 	}
 }
 
+/**
+ * Bound constructor for a object 3d
+ * 
+ * @param vertices the object vertices
+ */
+Bound::Bound(const Bound& other)
+{
+	xMax = other.xMax;
+	xMin = other.xMin;
+
+	yMax = other.yMax;
+	yMin = other.yMin;
+
+	zMax = other.zMax;
+	zMin = other.zMin;
+}
+
 //----------------------------------OVERRIDES-----------------------------------//
 
 /**
@@ -55,7 +72,7 @@ Bound::Bound(const std::vector<Point3f>& vertices)
  * 
  * @return the string definition
  */
-std::string Bound::toString()
+std::string Bound::toString() const
 {
 	return "x: "+std::to_string(xMin)+" .. "+std::to_string(xMax)
 		+"\ny: "+std::to_string(yMin)+" .. "+std::to_string(yMax)
@@ -70,7 +87,7 @@ std::string Bound::toString()
  * @param bound other bound to make the comparison
  * @return true if they insersect, false otherwise
  */
-bool Bound::overlap(Bound& bound)
+bool Bound::overlap(const Bound& bound) const
 {
 	if((xMin>bound.xMax+TOL)||(xMax<bound.xMin-TOL)||(yMin>bound.yMax+TOL)||(yMax<bound.yMin-TOL)||(zMin>bound.zMax+TOL)||(zMax<bound.zMin-TOL))
 	{

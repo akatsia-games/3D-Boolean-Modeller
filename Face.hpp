@@ -46,11 +46,13 @@ public:
 
 	Face(Vertex& v1, Vertex& v2, Vertex& v3);
 	
-	Face(Face& other);
+	Face(const Face& other);
 	
 	std::string toString() const;
 	
-	bool equals(Face& other) const;
+	bool equals(const Face& other) const;
+
+	bool operator!=(const Face& other)const;
 	
 	Bound getBound() const;
 	
@@ -77,7 +79,7 @@ private:
 
 	static int linePositionInZ(Point3f point, Point3f pointLine1, Point3f pointLine2);
 
-	Vertex& getVertex(int id);
+	const Vertex& getVertex(int id)const;
 
 	
 

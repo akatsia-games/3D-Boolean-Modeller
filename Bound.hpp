@@ -37,6 +37,13 @@ public:
 	 */
 	Bound(const std::vector<Point3f>& vertices);
 	
+	/**
+	 * Bound constructor for a object 3d
+	 * 
+	 * @param vertices the object vertices
+	 */
+	Bound(const Bound& other);
+	
 	//----------------------------------OVERRIDES-----------------------------------//
 	
 	/**
@@ -44,7 +51,7 @@ public:
 	 * 
 	 * @return the string definition
 	 */
-	std::string toString();
+	std::string toString() const;
 	
 	//--------------------------------------OTHERS----------------------------------//
 	
@@ -54,7 +61,7 @@ public:
 	 * @param bound other bound to make the comparison
 	 * @return true if they insersect, false otherwise
 	 */
-	bool overlap(Bound& bound);
+	bool overlap(const Bound& bound) const;
 	
 	//-------------------------------------PRIVATES---------------------------------//
 	

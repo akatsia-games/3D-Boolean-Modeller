@@ -106,6 +106,22 @@ Segment::Segment(const Segment& other)
 {
 }
 
+
+	
+Segment::Segment()
+	:startType(INVALID)
+	,middleType(INVALID)
+	,endType(INVALID)
+{
+
+};
+
+
+bool Segment::isInvalid() const
+{
+	return (startType == INVALID) || (middleType == INVALID)|| (endType == INVALID);
+}
+
 //-------------------------------------GETS-------------------------------------//
 
 /**

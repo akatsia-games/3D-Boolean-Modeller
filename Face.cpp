@@ -55,7 +55,7 @@ Face::Face(Vertex& v1, Vertex& v2, Vertex& v3)
  * 
  * @return cloned face object
  */
-Face::Face(Face& other)
+Face::Face(const Face& other)
 	:v1(other.v1)
 	,v2(other.v2)
 	,v3(other.v3)
@@ -80,32 +80,35 @@ std::string Face::toString() const
  * @param anObject the other face to be tested
  * @return true if they are equal, false otherwise. 
  */
-bool Face::equals(Face& other) const
+bool Face::equals(const Face& other) const
 {
 	for(int i = 1; i<=3; ++i){
+
 		if(!v1.equals(other.getVertex(i))) continue;
-		
-		for(int j = 1; j<=3; ++j){
-			if(j==i) continue;
-			if(!v2.equals(other.getVertex(j))) continue;
 
-			for(int k = 1; k<=3; ++k){
-				if(k == i || k == j) continue;
-				if(!v3.equals(other.getVertex(k))) continue;
+		int j = (i+1)%3;
 
-				return true;
-			}
-			break;
-		}
-		break;
+		if(!v2.equals(other.getVertex(j))) continue;
+
+		int k = (i+2)%3;
+
+		if(!v3.equals(other.getVertex(k))) continue;
+
+		return true;
 	}
 	return false;
-	/*
-	bool cond1 = v1.equals(other.v1) && v2.equals(other.v2) && v3.equals(other.v3);
-	bool cond2 = v1.equals(other.v2) && v2.equals(other.v3) && v3.equals(other.v1);
-	bool cond3 = v1.equals(other.v3) && v2.equals(other.v1) && v3.equals(other.v2);
-	
-	return cond1 || cond2 || cond3;*/
+}
+
+/**
+ * Checks if a face isn't identical to another. To be equal, they have to have equal
+ * vertices in the same order
+ * 
+ * @param anObject the other face to be tested
+ * @return true if they are equal, false otherwise. 
+ */
+bool Face::operator!=(const Face& other) const
+{
+	return !((v1!=other.v1) || (v1!=other.v1) || (v1!=other.v1));
 }
 
 //-------------------------------------GETS-------------------------------------//
@@ -493,7 +496,7 @@ int Face::linePositionInZ(Point3f point, Point3f pointLine1, Point3f pointLine2)
 	}
 }
 
-Vertex& Face::getVertex(int id)
+const Vertex& Face::getVertex(int id)const
 {
 	switch(id){
 		case 1:

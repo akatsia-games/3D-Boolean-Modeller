@@ -16,6 +16,10 @@ public:
     float y;
     float z;
 
+    double isNAN() const{
+        return std::isnan(x)||std::isnan(y)||std::isnan(z);
+    }
+
     double dot(Vector3f other) const{
         return ((double)x*other.x)+((double)y*other.y)+((double)z*other.z);
     }

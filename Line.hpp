@@ -24,6 +24,10 @@ public:
 	Line(Vector3f direction, Point3f point);
 	
 	Line(const Line& other);
+	
+	Line();
+
+	bool isNAN() const;
 
 	std::string toString() const;
 

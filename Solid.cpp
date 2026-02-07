@@ -68,7 +68,7 @@ void Solid::setInitialFeatures()
  * 
  * @return solid vertices
  */	
-const std::vector<Point3f>& Solid::getVertices()
+const std::vector<Point3f>& Solid::getVertices() const
 {
 	return vertices;
 }
@@ -77,7 +77,7 @@ const std::vector<Point3f>& Solid::getVertices()
  * 
  * @return solid indices for its vertices
  */
-const std::vector<int>& Solid::getIndices()
+const std::vector<int>& Solid::getIndices() const
 {
 	return indices;
 }
@@ -86,7 +86,7 @@ const std::vector<int>& Solid::getIndices()
  * 
  * @return vertices colors
  */
-const std::vector<Colour3f>& Solid::getColors()
+const std::vector<Colour3f>& Solid::getColors() const
 {
 	return colors;
 }
@@ -96,7 +96,7 @@ const std::vector<Colour3f>& Solid::getColors()
  * 
  * @return true if the solid is empty, false otherwise
  */
-bool Solid::isEmpty()
+bool Solid::isEmpty() const
 {
 	return indices.size()==0;
 }	

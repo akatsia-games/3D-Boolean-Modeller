@@ -32,15 +32,15 @@ class Object3D
 {
 public:
 
-	Object3D(Solid solid);
+	Object3D(const Solid& solid);
 
-	Object3D(Object3D& other);
+	Object3D(const Object3D& other);
 
 	int getNumFaces();
 
-	Face getFace(int index);
+	const Face& getFace(int index) const;
 
-	Bound getBound();
+	const Bound& getBound()const;
 
 	void splitFaces(Object3D object);
 
@@ -48,11 +48,11 @@ public:
 
 private:
 
-	Face addFace(Vertex v1, Vertex v2, Vertex v3);
+	const Face& addFace(Vertex v1, Vertex v2, Vertex v3, int emplace = -1);
 
-	Vertex addVertex(Point3f pos, Colour3f color, int status);
+	const Vertex& addVertex(Point3f pos, Colour3f color, int status);
 
-	double computeDistance(Vertex vertex, Face face);
+	double computeDistance(const Vertex& vertex, const Face& face)const;
 
 	void splitFace(int facePos, Segment segment1, Segment segment2);
 
@@ -71,6 +71,8 @@ private:
 	void breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Vertex endVertex);
 
 	void breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, int linedVertex);
+	
+	void invertInsideFaces();
 	
 	/** solid vertices  */
 	std::vector<Vertex> vertices;

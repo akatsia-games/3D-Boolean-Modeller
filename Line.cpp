@@ -88,6 +88,19 @@ Line::Line(const Line& other)
 	point = other.point;
 }
 
+
+	
+Line::Line()
+	:point({NAN,NAN,NAN})
+	,direction({NAN,NAN,NAN})
+{
+
+}
+
+bool Line::isNAN() const{
+	return point.isNAN()||direction.isNAN();
+}
+
 /**
  * Makes a string definition for the Line object
  * 

@@ -28,13 +28,19 @@ public:
 	/** define as edge one of the segment ends */
 	constexpr static const int EDGE = 3;
 	
+	constexpr static const int INVALID = 4;
+	
 	//---------------------------------CONSTRUCTORS---------------------------------//
 		
 	Segment(const Line& line, const Face& face, int sign1, int sign2, int sign3);
 	
 	Segment(const Segment& other);
 	
+	Segment();
+	
 	//-------------------------------------GETS-------------------------------------//
+	bool isInvalid() const;
+
 	Vertex getStartVertex();
 
 	Vertex getEndVertex();

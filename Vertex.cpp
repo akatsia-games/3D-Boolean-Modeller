@@ -135,6 +135,22 @@ bool Vertex::equals(const Vertex& other) const
 			&& abs(z-other.z)<TOL && color.equals(other.color);
 }
 
+/**
+ * Checks if an vertex isn't identical to another. To be equal, they have to have the same
+ * coordinates(with some tolerance) and color
+ * 
+ * @param anObject the other vertex to be tested
+ * @return true if they are equal, false otherwise. 
+ */
+bool Vertex::operator!=(const Vertex& other) const
+{
+
+	return 	(nextafter(x, INFINITY) >= other.x)
+		  &&(nextafter(x,-INFINITY) <= other.x)
+		  &&(nextafter(y, INFINITY) >= other.y)
+		  &&(nextafter(y,-INFINITY) <= other.y);
+}
+
 //--------------------------------------SETS------------------------------------//
 	
 /**

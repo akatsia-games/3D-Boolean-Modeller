@@ -35,6 +35,8 @@ public:
 
 	bool equals(const Vertex& other) const;
 
+	bool operator!=(const Vertex& other) const;
+
 	void setStatus(int status);
 
 	Point3f getPosition() const;

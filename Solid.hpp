@@ -28,13 +28,13 @@ public:
 
 	Solid(std::basic_istream<char>& solidFile, Colour3f color);
 
-	const std::vector<Point3f>& getVertices();
+	const std::vector<Point3f>& getVertices() const;
 
-	const std::vector<int>& getIndices();
+	const std::vector<int>& getIndices() const;
 
-	const std::vector<Colour3f>& getColors();
+	const std::vector<Colour3f>& getColors() const;
 
-	bool isEmpty();
+	bool isEmpty() const;
 
 	void setData(const std::vector<Point3f>& vertices, const std::vector<int>& indices, const std::vector<Colour3f>& colors);
 

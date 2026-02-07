@@ -217,8 +217,8 @@ Colour3f Vertex::getColor() const
  */
 void Vertex::addAdjacentVertex(Vertex* adjacentVertex)
 {
-	if(std::find(adjacentVertices.begin(),adjacentVertices.end(),
-		[adjacentVertex](Vertex* curr_vertex){return curr_vertex==adjacentVertex;}) == adjacentVertices.end())
+	if(std::find_if(adjacentVertices.begin(),adjacentVertices.end(),
+		[&adjacentVertex](const Vertex* curr_vertex){return curr_vertex->equals(*adjacentVertex);}) == adjacentVertices.end())
 	{
 		adjacentVertices.push_back(adjacentVertex);
 	} 

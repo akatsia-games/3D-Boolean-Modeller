@@ -45,12 +45,16 @@ public:
 	void splitFaces(Object3D object);
 
 	void classifyFaces(Object3D object);
+	
+	void invertInsideFaces();
 
 private:
 
+
 	const Face& addFace(Vertex v1, Vertex v2, Vertex v3, int emplace = -1);
 
-	const Vertex& addVertex(Point3f pos, Colour3f color, int status);
+	static int discardedIndex;
+	const Vertex& addVertex(Point3f pos, Colour3f color, int status, int& index = discardedIndex);
 
 	double computeDistance(const Vertex& vertex, const Face& face)const;
 
@@ -71,8 +75,6 @@ private:
 	void breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Vertex endVertex);
 
 	void breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, int linedVertex);
-	
-	void invertInsideFaces();
 	
 	/** solid vertices  */
 	std::vector<Vertex> vertices;

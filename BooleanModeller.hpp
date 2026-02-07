@@ -40,7 +40,7 @@ private:
 
 	Solid composeSolid(int faceStatus1, int faceStatus2, int faceStatus3);
 	
-	void groupObjectComponents(Object3D& object, std::vector<Point3f>& vertices, std::vector<int>& indices, std::vector<Colour3f>& colors, int faceStatus1, int faceStatus2);
+	void groupObjectComponents(Object3D& object, std::vector<Vertex>& vertices, std::vector<int>& indices, std::vector<Colour3f>& colors, int faceStatus1, int faceStatus2);
 
 	/** solid where bool operations will be applied */
 	Object3D object1, object2;

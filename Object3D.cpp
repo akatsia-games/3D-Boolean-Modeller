@@ -33,19 +33,19 @@ const Face nullFace;
 Object3D::Object3D(const Solid& solid)
 	:bound(solid.getVertices())
 {
-	Vertex v1, v2, v3, vertex;
 	const std::vector<Point3f>& verticesPoints = solid.getVertices();
 	const std::vector<int>& indices = solid.getIndices();
 	const std::vector<Colour3f>& colors = solid.getColors();
-	std::vector<Vertex> verticesTemp;
+	std::vector<int> indexOfSolidVertices;
 	
 	//create vertices
 	vertices.resize(0);
 	vertices.reserve(verticesPoints.size());
 	for(int i=0;i<verticesPoints.size();i++)
 	{
-		vertex = addVertex(verticesPoints[i], colors[i], Vertex::UNKNOWN);
-		verticesTemp.push_back(vertex); 
+		int idx = 0;
+		addVertex(verticesPoints[i], colors[i], Vertex::UNKNOWN, idx);
+		indexOfSolidVertices.push_back(idx); 
 	}
 	
 	//create faces
@@ -53,9 +53,9 @@ Object3D::Object3D(const Solid& solid)
 	faces.reserve(((indices.size()-1)/3)+1); //indices.size / 3 rounded up
 	for(int i=0; i<indices.size(); i=i+3)
 	{
-		v1 = (Vertex)verticesTemp[indices[i]];
-		v2 = (Vertex)verticesTemp[indices[i+1]];
-		v3 = (Vertex)verticesTemp[indices[i+2]];
+		Vertex& v1 = this->vertices[indexOfSolidVertices[indices[i]]];
+		Vertex& v2 = this->vertices[indexOfSolidVertices[indices[i+1]]];
+		Vertex& v3 = this->vertices[indexOfSolidVertices[indices[i+2]]];
 		addFace(v1, v2, v3);
 	}
 }
@@ -149,12 +149,15 @@ const Face& Object3D::addFace(Vertex v1, Vertex v2, Vertex v3, int emplace)
 	}
 }
 
+int Object3D::discardedIndex = 0;
+
 /**
  * Method used to add a vertex properly for internal methods
  * 
  * @param pos vertex position
  * @param color vertex color
  * @param status vertex status
+ * @param index - return index
  * @return the vertex inserted (if a similar vertex already exists, this is returned)
  */
 const Vertex& Object3D::addVertex(Point3f pos, Colour3f color, int status, int& index)
@@ -806,12 +809,12 @@ void Object3D::classifyFaces(Object3D object)
 	for(int i=0;i<this->getNumFaces();i++)
 	{
 		face = this->getFace(i); // this needs to be rewritten for c++
-		face.v1.addAdjacentVertex(face.v2);
-		face.v1.addAdjacentVertex(face.v3);
-		face.v2.addAdjacentVertex(face.v1);
-		face.v2.addAdjacentVertex(face.v3);
-		face.v3.addAdjacentVertex(face.v1);
-		face.v3.addAdjacentVertex(face.v2);
+		face.v1.addAdjacentVertex(&face.v2);
+		face.v1.addAdjacentVertex(&face.v3);
+		face.v2.addAdjacentVertex(&face.v1);
+		face.v2.addAdjacentVertex(&face.v3);
+		face.v3.addAdjacentVertex(&face.v1);
+		face.v3.addAdjacentVertex(&face.v2);
 	}
 	
 	//for each face

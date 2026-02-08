@@ -1,7 +1,7 @@
 #ifndef __SOLID__
 #define __SOLID__
 
-#include<istream>
+#include<iostream>
 #include<vector>
 #include"Point3f.hpp"
 
@@ -27,6 +27,8 @@ public:
 	Solid(std::vector<Point3f>& vertices, std::vector<int>& indices, std::vector<Colour3f>& colors);
 
 	Solid(std::basic_istream<char>& solidFile, Colour3f color);
+
+	void write(std::basic_ostream<char>& solidFile) const;
 
 	const std::vector<Point3f>& getVertices() const;
 

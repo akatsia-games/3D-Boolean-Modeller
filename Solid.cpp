@@ -268,7 +268,7 @@ void Solid::defineGeometry()
 /**
  * Loads a coordinates file, setting vertices and indices 
  * 
- * @param solidFile file used to create the solid
+ * @param solidFile file stream used to create the solid
  * @param color solid color
  */
 void Solid::loadCoordinateFile(std::basic_istream<char>& solidFile, Colour3f color)
@@ -301,6 +301,31 @@ void Solid::loadCoordinateFile(std::basic_istream<char>& solidFile, Colour3f col
 	colors.resize(vertices.size(),color);
 	
 	defineGeometry();
+}
+
+/**
+ * Writes a coordinates file
+ * 
+ * @param solidFile file stream
+ */
+void Solid::write(std::basic_ostream<char>& solidFile) const
+{
+	solidFile<<vertices.size()<<std::endl;
+				
+	for(int i=0;i<vertices.size();i++)
+	{
+		auto& vertex = vertices[i];
+		solidFile<<vertex.x<<" "<<vertex.y<<" "<<vertex.z<<std::endl;
+	}
+	
+	solidFile<<indices.size()/3<<std::endl;
+				
+	for(int i=0,j=0;i<(indices.size()/3)*3;i=i+3,j++)
+	{
+		solidFile<<indices[i]<<" ";
+		solidFile<<indices[i+1]<<" ";
+		solidFile<<indices[i+2]<<std::endl;
+	}
 }
 
 /**

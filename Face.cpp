@@ -66,6 +66,7 @@ Face& Face::operator=(const Face& other){
 	v[2] = other.v[2];
 	v[3] = other.v[3];
 	status = other.status;
+	return *this;
 }
 
 /**

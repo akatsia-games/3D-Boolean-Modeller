@@ -7,6 +7,7 @@
 #include<string>
 
 class Object3D;
+class Segment;
 
 /**
  * Representation of a 3D face (triangle).
@@ -21,6 +22,7 @@ class Object3D;
  */
 class Face
 {
+	friend Segment;
 public:
 	/** face status if it is still unknown */
 	static const int UNKNOWN = 1;
@@ -35,16 +37,23 @@ public:
 
 	static const int INVALID = 6;
 
-	/** first vertex */
-	Vertex v1;
-	/** second vertex */
-	Vertex v2;
-	/** third vertex */
-	Vertex v3;
+	Face& operator=(const Face& other);
 	
-	Face();
+	/** first vertex */
+	Vertex& v1();
+	const Vertex& v1()const;
+	/** second vertex */
+	Vertex& v2();
+	const Vertex& v2()const;
+	/** third vertex */
+	Vertex& v3();
+	const Vertex& v3()const;
+	
+	int v[3];
+	
+	Face(std::vector<Vertex>& solidVertices);
 
-	Face(Vertex& v1, Vertex& v2, Vertex& v3);
+	Face(std::vector<Vertex>& solidVertices, int v1, int v2, int v3);
 	
 	Face(const Face& other);
 	
@@ -81,7 +90,10 @@ private:
 
 	const Vertex& getVertex(int id)const;
 
+	std::vector<Vertex>& solidVertices;
 	
+
+	static std::vector<Vertex> emptyVertexVector;
 
 	/** face status relative to a solid  */
 	int status;

@@ -19,15 +19,18 @@
 class Vertex
 {
 public:
-	Vertex(Point3f position, Colour3f color);
+	Vertex(std::vector<Vertex>& solidVertices, Point3f position, Colour3f color);
 	
-	Vertex(double x, double y, double z, Colour3f color);
+	Vertex(std::vector<Vertex>& solidVertices, double x, double y, double z, Colour3f color);
 	
-	Vertex(Point3f position, Colour3f color, int status);
+	Vertex(std::vector<Vertex>& solidVertices, Point3f position, Colour3f color, int status);
 	
-	Vertex(double x, double y, double z, Colour3f color, int status);
+	Vertex(std::vector<Vertex>& solidVertices, double x, double y, double z, Colour3f color, int status);
 
 	Vertex(const Vertex& other);
+
+	Vertex& operator=(const Vertex& other) = delete;
+	const Vertex& operator=(const Vertex& other)const = delete;
 
 	Vertex();
 
@@ -41,13 +44,13 @@ public:
 
 	Point3f getPosition() const;
 
-	const std::vector<Vertex*>& getAdjacentVertices() const;
+	const std::vector<int>& getAdjacentVertices() const;
 
 	int getStatus() const;
 
 	Colour3f getColor() const;
 
-	void addAdjacentVertex(Vertex* adjacentVertex);
+	void addAdjacentVertex(int index);
 
 	void mark(int status);
 
@@ -57,6 +60,8 @@ public:
 	double y;
 	/** vertex coordinate in Z */
 	double z;
+
+	int id() const;
 	
 	/** vertex status if it is still unknown */
 	static const int UNKNOWN = 1;
@@ -71,11 +76,16 @@ public:
 
 private:
 	/** references to vertices conected to it by an edge  */
-	std::vector<Vertex*> adjacentVertices;
+	std::vector<Vertex>& solidVertices;
+	std::vector<int> adjacentVertexIndexes;
+
+	//std::vector<Vertex*> adjacentVertices;
 	/** vertex status relative to other object */
 	int status;
 	/** vertex color */
 	Colour3f color;
+
+	static std::vector<Vertex> emptyVertexVector;
 	
 	/** tolerance value to test equalities */
 	constexpr static const double TOL = 1e-5f;

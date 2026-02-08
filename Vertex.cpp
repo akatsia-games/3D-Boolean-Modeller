@@ -19,7 +19,8 @@
  * @param position vertex position
  * @param color vertex color
  */
-Vertex::Vertex(Point3f position, Colour3f color)
+Vertex::Vertex(std::vector<Vertex>& solidVertices, Point3f position, Colour3f color)
+	:solidVertices(solidVertices)
 {
 	this->color = color;
 	
@@ -38,7 +39,8 @@ Vertex::Vertex(Point3f position, Colour3f color)
  * @param z coordinate on the z axis
  * @param color vertex color
  */
-Vertex::Vertex(double x, double y, double z, Colour3f color)
+Vertex::Vertex(std::vector<Vertex>& solidVertices, double x, double y, double z, Colour3f color)
+	:solidVertices(solidVertices)
 {
 	this->color = color;
 			
@@ -56,7 +58,8 @@ Vertex::Vertex(double x, double y, double z, Colour3f color)
  * @param color vertex color
  * @param status vertex status - UNKNOWN, BOUNDARY, INSIDE or OUTSIDE
  */
-Vertex::Vertex(Point3f position, Colour3f color, int status)
+Vertex::Vertex(std::vector<Vertex>& solidVertices, Point3f position, Colour3f color, int status)
+	:solidVertices(solidVertices)
 {
 	this->color = color;
 	
@@ -76,7 +79,8 @@ Vertex::Vertex(Point3f position, Colour3f color, int status)
  * @param color vertex color
  * @param status vertex status - UNKNOWN, BOUNDARY, INSIDE or OUTSIDE
  */
-Vertex::Vertex(double x, double y, double z, Colour3f color, int status)
+Vertex::Vertex(std::vector<Vertex>& solidVertices, double x, double y, double z, Colour3f color, int status)
+	:solidVertices(solidVertices)
 {
 	this->color = color;
 	
@@ -95,19 +99,21 @@ Vertex::Vertex(double x, double y, double z, Colour3f color, int status)
  * @return cloned vertex object
  */
 Vertex::Vertex(const Vertex& other)
+	:solidVertices(other.solidVertices)
 {
 	x = other.x;
 	y = other.y;
 	z = other.z;
 	color = other.color;
 	status = other.status;
-	adjacentVertices = other.adjacentVertices;
+	adjacentVertexIndexes = other.adjacentVertexIndexes;
 }
 
 /**
  * Create invalid vertex object
  */
 Vertex::Vertex()
+	:solidVertices(Vertex::emptyVertexVector)
 {
 	status = INVALID;
 }
@@ -183,9 +189,9 @@ Point3f Vertex::getPosition() const
  * 
  * @return array of the adjacent vertices 
  */
-const std::vector<Vertex*>& Vertex::getAdjacentVertices() const
+const std::vector<int>& Vertex::getAdjacentVertices() const
 {
-	return adjacentVertices;
+	return adjacentVertexIndexes;
 }
 
 /**
@@ -215,12 +221,12 @@ Colour3f Vertex::getColor() const
  * 
  * @param adjacentVertex an adjacent vertex
  */
-void Vertex::addAdjacentVertex(Vertex* adjacentVertex)
+void Vertex::addAdjacentVertex(int adjacentVertex)
 {
-	if(std::find_if(adjacentVertices.begin(),adjacentVertices.end(),
-		[&adjacentVertex](const Vertex* curr_vertex){return curr_vertex->equals(*adjacentVertex);}) == adjacentVertices.end())
+	if(std::find_if(adjacentVertexIndexes.begin(),adjacentVertexIndexes.end(),
+		[&adjacentVertex](const int& curr_vertex){return curr_vertex == adjacentVertex;}) == adjacentVertexIndexes.end())
 	{
-		adjacentVertices.push_back(adjacentVertex);
+		adjacentVertexIndexes.push_back(adjacentVertex);
 	} 
 }
 
@@ -233,13 +239,23 @@ void Vertex::mark(int status)
 {
 	//mark vertex
 	this->status = status;
+
+	if(solidVertices.size() == 0) return;
 	
 	//mark adjacent vertices
-	for(auto adjVertexPtr : adjacentVertices)
+	for(int adjVertexIdx : adjacentVertexIndexes)
 	{
-		if(adjVertexPtr->getStatus()==Vertex::UNKNOWN)
+		if(solidVertices[adjVertexIdx].getStatus()==Vertex::UNKNOWN)
 		{
-			adjVertexPtr->mark(status);
+			solidVertices[adjVertexIdx].mark(status);
 		}
 	}
+}
+
+int Vertex::id()const{
+	for (int idx = 0; idx< solidVertices.size(); ++idx){
+		if(solidVertices[idx]!=(*this)) continue;
+		return idx;
+	}
+	return 0;
 }

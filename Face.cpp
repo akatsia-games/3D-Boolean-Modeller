@@ -25,12 +25,11 @@
  * @param v2 a face vertex
  * @param v3 a face vertex
  */
-Face::Face()
-	:v1(0,0,0,{0,0,0})
-	,v2(0,0,0,{0,0,0})
-	,v3(0,0,0,{0,0,0})
+Face::Face(std::vector<Vertex>& solidVertices)
+	:v{0,0,0}
+	,solidVertices(solidVertices)
 {
-	this->status = Face::INVALID;
+	status = Face::INVALID;
 }
 	
 /**
@@ -40,12 +39,11 @@ Face::Face()
  * @param v2 a face vertex
  * @param v3 a face vertex
  */
-Face::Face(Vertex& v1, Vertex& v2, Vertex& v3)
-	:v1(v1)
-	,v2(v2)
-	,v3(v3)
+Face::Face(std::vector<Vertex>& solidVertices, int v1, int v2, int v3)
+	:v{v1, v2, v3}
+	,solidVertices(solidVertices)
 {
-	this->status = Face::UNKNOWN;
+	status = Face::UNKNOWN;
 }
 
 //-----------------------------------OVERRIDES----------------------------------//
@@ -56,11 +54,18 @@ Face::Face(Vertex& v1, Vertex& v2, Vertex& v3)
  * @return cloned face object
  */
 Face::Face(const Face& other)
-	:v1(other.v1)
-	,v2(other.v2)
-	,v3(other.v3)
+	:v{other.v[1], other.v[2], other.v[3]}
 	,status(other.status)
+	,solidVertices(other.solidVertices)
 {
+}
+
+
+Face& Face::operator=(const Face& other){
+	v[1] = other.v[1];
+	v[2] = other.v[2];
+	v[3] = other.v[3];
+	status = other.status;
 }
 
 /**
@@ -70,7 +75,7 @@ Face::Face(const Face& other)
  */
 std::string Face::toString() const
 {
-	return v1.toString()+"\n"+v2.toString()+"\n"+v3.toString();
+	return v1().toString()+"\n"+v2().toString()+"\n"+v3().toString();
 }
 
 /**
@@ -84,15 +89,15 @@ bool Face::equals(const Face& other) const
 {
 	for(int i = 1; i<=3; ++i){
 
-		if(!v1.equals(other.getVertex(i))) continue;
+		if(!v1().equals(other.getVertex(i))) continue;
 
 		int j = (i+1)%3;
 
-		if(!v2.equals(other.getVertex(j))) continue;
+		if(!v2().equals(other.getVertex(j))) continue;
 
 		int k = (i+2)%3;
 
-		if(!v3.equals(other.getVertex(k))) continue;
+		if(!v3().equals(other.getVertex(k))) continue;
 
 		return true;
 	}
@@ -108,10 +113,32 @@ bool Face::equals(const Face& other) const
  */
 bool Face::operator!=(const Face& other) const
 {
-	return !((v1!=other.v1) || (v1!=other.v1) || (v1!=other.v1));
+	return !((v[1]!=other.v[1]) || (v[2]!=other.v[2]) || (v[3]!=other.v[3]));
 }
 
 //-------------------------------------GETS-------------------------------------//
+
+/** first vertex */
+Vertex& Face::v1(){
+	return solidVertices[v[2]];
+}
+const Vertex& Face::v1()const{
+	return solidVertices[v[2]];
+}
+/** second vertex */
+Vertex& Face::v2(){
+	return solidVertices[v[2]];
+}
+const Vertex& Face::v2()const{
+	return solidVertices[v[2]];
+}
+/** third vertex */
+Vertex& Face::v3(){
+	return solidVertices[v[3]];
+}
+const Vertex& Face::v3()const{
+	return solidVertices[v[3]];
+}
 
 /**
  * Gets the face bound
@@ -120,7 +147,7 @@ bool Face::operator!=(const Face& other) const
  */
 Bound Face::getBound() const
 {
-	Bound rval(v1.getPosition(),v2.getPosition(),v3.getPosition());
+	Bound rval(v1().getPosition(),v2().getPosition(),v3().getPosition());
 	return rval;
 }
 
@@ -131,9 +158,9 @@ Bound Face::getBound() const
  */
 Vector3f Face::getNormal() const
 {
-	Point3f p1 = v1.getPosition();
-	Point3f p2 = v2.getPosition();
-	Point3f p3 = v3.getPosition();
+	Point3f p1 = v1().getPosition();
+	Point3f p2 = v2().getPosition();
+	Point3f p3 = v3().getPosition();
 	
 	Vector3f xy = {p2.x-p1.x, p2.y-p1.y, p2.z-p1.z};
 	Vector3f xz = {p3.x-p1.x, p3.y-p1.y, p3.z-p1.z};
@@ -164,9 +191,9 @@ int Face::getStatus() const
 float Face::getArea() const
 {
 	//area = (a * c * sen(B))/2
-	Point3f p1 = v1.getPosition();
-	Point3f p2 = v2.getPosition();
-	Point3f p3 = v3.getPosition();
+	Point3f p1 = v1().getPosition();
+	Point3f p2 = v2().getPosition();
+	Point3f p3 = v3().getPosition();
 	Vector3f xy = {p2.x-p1.x, p2.y-p1.y, p2.z-p1.z};
 	Vector3f xz = {p3.x-p1.x, p3.y-p1.y, p3.z-p1.z};
 	
@@ -182,9 +209,9 @@ float Face::getArea() const
 /** Invert face direction (normal direction) */
 void Face::invert()
 {
-	Vertex vertexTemp = v2;
-	v2 = v1;
-	v1 = vertexTemp;
+	int vertexTemp = v[2];
+	v[2] = v[1];
+	v[1] = vertexTemp;
 }
 	
 //------------------------------------CLASSIFIERS-------------------------------//
@@ -196,9 +223,9 @@ void Face::invert()
  */
 bool Face::simpleClassify()
 {
-	int status1 = v1.getStatus();
-	int status2 = v2.getStatus();
-	int status3 = v3.getStatus();
+	int status1 = v1().getStatus();
+	int status2 = v2().getStatus();
+	int status3 = v3().getStatus();
 		
 	if(status1==Vertex::INSIDE || status1==Vertex::OUTSIDE)
 	{
@@ -230,15 +257,15 @@ void Face::rayTraceClassify(Object3D& object)
 {
 	//creating a ray starting starting at the face baricenter going to the normal direction
 	Point3f p0;
-	p0.x = (v1.x + v2.x + v3.x)/3.0;
-	p0.y = (v1.y + v2.y + v3.y)/3.0;
-	p0.z = (v1.z + v2.z + v3.z)/3.0;
+	p0.x = (v1().x + v2().x + v3().x)/3.0;
+	p0.y = (v1().y + v2().y + v3().y)/3.0;
+	p0.z = (v1().z + v2().z + v3().z)/3.0;
 	Line ray(getNormal(),p0);
 	
 	bool success;
 	double dotProduct, distance; 
 	Point3f intersectionPoint;
-	Face closestFace; //construct invalid face
+	Face closestFace(solidVertices); //construct invalid face
 	double closestDistance; 
 								
 	do
@@ -250,7 +277,7 @@ void Face::rayTraceClassify(Object3D& object)
 		{
 			Face face = object.getFace(i);
 			dotProduct = this->getNormal().dot(ray.getDirection());
-			intersectionPoint = ray.computePlaneIntersection(this->getNormal(), this->v1.getPosition());
+			intersectionPoint = ray.computePlaneIntersection(this->getNormal(), this->v1().getPosition());
 							
 			//if ray intersects the plane...  
 			if(intersectionPoint.isNAN())
@@ -352,25 +379,25 @@ bool Face::hasPoint(Point3f& point)
 	if(abs(normal.x)>TOL) 
 	{
 		//tests on the x plane
-		result1 = linePositionInX(point, v1.getPosition(), v2.getPosition());
-		result2 = linePositionInX(point, v2.getPosition(), v3.getPosition());
-		result3 = linePositionInX(point, v3.getPosition(), v1.getPosition());
+		result1 = linePositionInX(point, v1().getPosition(), v2().getPosition());
+		result2 = linePositionInX(point, v2().getPosition(), v3().getPosition());
+		result3 = linePositionInX(point, v3().getPosition(), v1().getPosition());
 	}
 	
 	//if y is constant...
 	else if(abs(normal.y)>TOL)
 	{
 		//tests on the y plane
-		result1 = linePositionInY(point, v1.getPosition(), v2.getPosition());
-		result2 = linePositionInY(point, v2.getPosition(), v3.getPosition());
-		result3 = linePositionInY(point, v3.getPosition(), v1.getPosition());
+		result1 = linePositionInY(point, v1().getPosition(), v2().getPosition());
+		result2 = linePositionInY(point, v2().getPosition(), v3().getPosition());
+		result3 = linePositionInY(point, v3().getPosition(), v1().getPosition());
 	}
 	else
 	{
 		//tests on the z plane
-		result1 = linePositionInZ(point, v1.getPosition(), v2.getPosition());
-		result2 = linePositionInZ(point, v2.getPosition(), v3.getPosition());
-		result3 = linePositionInZ(point, v3.getPosition(), v1.getPosition());
+		result1 = linePositionInZ(point, v1().getPosition(), v2().getPosition());
+		result2 = linePositionInZ(point, v2().getPosition(), v3().getPosition());
+		result3 = linePositionInZ(point, v3().getPosition(), v1().getPosition());
 	}
 	
 	//if the point is up and down two lines...		
@@ -500,11 +527,11 @@ const Vertex& Face::getVertex(int id)const
 {
 	switch(id){
 		case 1:
-			return v1;
+			return v1();
 		case 2:
-			return v2;
+			return v2();
 		case 3:
-			return v3;
+			return v3();
 		default:
 			abort();
 	}

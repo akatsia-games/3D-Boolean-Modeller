@@ -122,16 +122,15 @@ Solid BooleanModeller::composeSolid(int faceStatus1, int faceStatus2, int faceSt
 	*/
 void BooleanModeller::groupObjectComponents(Object3D& object, std::vector<Vertex>& vertices, std::vector<int>& indices, std::vector<Colour3f>& colors, int faceStatus1, int faceStatus2)
 {
-	Face face;
 	//for each face..
 	for(int i=0;i<object.getNumFaces();i++)
 	{
-		face = object.getFace(i);
+		const Face& face = object.getFace(i);
 		//if the face status fits with the desired status...
 		if(face.getStatus()==faceStatus1 || face.getStatus()==faceStatus2)
 		{
 			//adds the face elements into the arrays
-			std::vector<Vertex> faceVerts = {face.v1, face.v2, face.v3};
+			std::vector<Vertex> faceVerts = {face.v1(), face.v2(), face.v3()};
 			for(int j=0;j<faceVerts.size();j++)
 			{
 				auto it = std::find_if(vertices.begin(),vertices.end(),

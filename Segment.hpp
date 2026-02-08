@@ -36,14 +36,16 @@ public:
 	
 	Segment(const Segment& other);
 	
-	Segment();
+	Segment() = delete;
+
+	Segment operator=(const Segment& other) = delete;
 	
 	//-------------------------------------GETS-------------------------------------//
 	bool isInvalid() const;
 
-	Vertex getStartVertex();
+	Vertex& getStartVertex();
 
-	Vertex getEndVertex();
+	Vertex& getEndVertex();
 
 	double getStartDistance();
 
@@ -65,9 +67,9 @@ public:
 	
 	//---------------------------------PRIVATES-------------------------------------//
 private:
-	bool setVertex(const Vertex& vertex);
+	bool setVertex(int vertex_id);
 	
-	bool setEdge(const Vertex& vertex1, const Vertex& vertex2);
+	bool setEdge(int vertex1, int vertex2);
 	
 	void swapEnds();
 	
@@ -88,10 +90,17 @@ private:
 	/** ending point status relative to the face */
 	int endType;
 	
+	std::vector<Vertex>& solidVertices;
 	/** nearest vertex from the starting point */
-	Vertex startVertex;
+	int sv;
 	/** nearest vertex from the ending point */
-	Vertex endVertex; 
+	int ev; 
+
+	
+	/** nearest vertex from the starting point */
+	Vertex& startVertex();
+	/** nearest vertex from the ending point */
+	Vertex& endVertex(); 
 	
 	/** start of the intersection point */
 	Point3f startPos;

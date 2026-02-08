@@ -39,6 +39,7 @@ public:
 	int getNumFaces();
 
 	const Face& getFace(int index) const;
+	Face& getFace(int index);
 
 	const Bound& getBound()const;
 
@@ -51,10 +52,10 @@ public:
 private:
 
 
-	const Face& addFace(Vertex v1, Vertex v2, Vertex v3, int emplace = -1);
+	int addFace(int v1, int v2, int v3, int emplace = -1);
 
 	static int discardedIndex;
-	const Vertex& addVertex(Point3f pos, Colour3f color, int status, int& index = discardedIndex);
+	int addVertex(Point3f pos, Colour3f color, int status, int& index = discardedIndex);
 
 	double computeDistance(const Vertex& vertex, const Face& face)const;
 
@@ -82,6 +83,10 @@ private:
 	std::vector<Face> faces;
 	/** object representing the solid extremes */
 	Bound bound;
+
+	
+	static std::vector<Vertex> emptyVertices;
+	static Face nullFace;
 	
 	/** tolerance value to test equalities */
 	constexpr static const double TOL = 1e-10f;

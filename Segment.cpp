@@ -27,39 +27,40 @@
  */
 Segment::Segment(const Line& line, const Face& face, int sign1, int sign2, int sign3)
 	:line(line)
+	,solidVertices(face.solidVertices)
 {
 	index = 0;
 	
 	//VERTEX is an end
 	if(sign1 == 0)
 	{
-		setVertex(face.v1);
+		setVertex(face.v[1]);
 		//other vertices on the same side - VERTEX-VERTEX VERTEX
 		if(sign2 == sign3)
 		{
-			setVertex(face.v1);
+			setVertex(face.v[1]);
 		}
 	}
 	
 	//VERTEX is an end
 	if(sign2 == 0)
 	{
-		setVertex(face.v2);
+		setVertex(face.v[2]);
 		//other vertices on the same side - VERTEX-VERTEX VERTEX
 		if(sign1 == sign3)
 		{
-			setVertex(face.v2);
+			setVertex(face.v[2]);
 		}
 	}
 	
 	//VERTEX is an end
 	if(sign3 == 0)
 	{
-		setVertex(face.v3);
+		setVertex(face.v[3]);
 		//other vertices on the same side - VERTEX-VERTEX VERTEX
 		if(sign1 == sign2)
 		{
-			setVertex(face.v3);
+			setVertex(face.v[3]);
 		}
 	}
 	
@@ -69,17 +70,17 @@ Segment::Segment(const Line& line, const Face& face, int sign1, int sign2, int s
 		//EDGE is an end
 		if((sign1==1 && sign2==-1)||(sign1==-1 && sign2==1))
 		{
-			setEdge(face.v1, face.v2);
+			setEdge(face.v[1], face.v[2]);
 		}
 		//EDGE is an end
 		if((sign2==1 && sign3==-1)||(sign2==-1 && sign3==1))
 		{
-			setEdge(face.v2, face.v3);
+			setEdge(face.v[2], face.v[3]);
 		}
 		//EDGE is an end
 		if((sign3==1 && sign1==-1)||(sign3==-1 && sign1==1))
 		{
-			setEdge(face.v3, face.v1);
+			setEdge(face.v[3], face.v[1]);
 		}
 	}
 }
@@ -99,22 +100,24 @@ Segment::Segment(const Segment& other)
 	,startType(other.startType)
 	,middleType(other.middleType)
 	,endType(other.endType)
-	,startVertex(other.startVertex)
-	,endVertex(other.endVertex)
+	,sv(other.sv)
+	,ev(other.ev)
 	,startPos(other.startPos)
 	,endPos(other.endPos)
+	,solidVertices(other.solidVertices)
 {
 }
 
 
-	
+	/*
 Segment::Segment()
 	:startType(INVALID)
 	,middleType(INVALID)
 	,endType(INVALID)
+	,
 {
 
-};
+};*/
 
 
 bool Segment::isInvalid() const
@@ -129,9 +132,9 @@ bool Segment::isInvalid() const
  * 
  * @return start vertex
  */
-Vertex Segment::getStartVertex()
+Vertex& Segment::getStartVertex()
 {
-	return startVertex;
+	return startVertex();
 }
 
 /**
@@ -139,9 +142,9 @@ Vertex Segment::getStartVertex()
  * 
  * @return end vertex
  */
-Vertex Segment::getEndVertex()
+Vertex& Segment::getEndVertex()
 {
-	return endVertex;
+	return endVertex();
 }
 
 /**
@@ -252,30 +255,30 @@ bool Segment::intersect(Segment& segment)
  * @param vertex the vertex that is an segment end 
  * @return false if all the ends were already defined, true otherwise
  */
-bool Segment::setVertex(const Vertex& vertex)
+bool Segment::setVertex(int vertex_id)
 {
 	//none end were defined - define starting point as VERTEX
 	if(index == 0)
 	{
-		startVertex = vertex;
+		sv = vertex_id;
 		startType = VERTEX;
-		startDist = line.computePointToPointDistance(vertex.getPosition());
-		startPos = startVertex.getPosition();
+		startDist = line.computePointToPointDistance(startVertex().getPosition());
+		startPos = startVertex().getPosition();
 		index++;
 		return true;
 	}
 	//starting point were defined - define ending point as VERTEX
 	if(index == 1)
 	{
-		endVertex = vertex;
+		ev = vertex_id;
 		endType = VERTEX;
-		endDist = line.computePointToPointDistance(vertex.getPosition());
-		endPos = endVertex.getPosition();
+		endDist = line.computePointToPointDistance(endVertex().getPosition());
+		endPos = endVertex().getPosition();
 		index++;
 		
 		//defining middle based on the starting point
 		//VERTEX-VERTEX-VERTEX
-		if(startVertex.equals(endVertex))
+		if(startVertex().equals(endVertex()))
 		{
 			middleType = VERTEX;
 		}
@@ -306,16 +309,16 @@ bool Segment::setVertex(const Vertex& vertex)
  * @param vertex2 one of the vertices of the intercepted edge
  * @return false if all ends were already defined, true otherwise
  */
-bool Segment::setEdge(const Vertex& vertex1, const Vertex& vertex2)
+bool Segment::setEdge(int vertex1, int vertex2)
 {
-	Point3f point1 = vertex1.getPosition();
-	Point3f point2 = vertex2.getPosition();
+	Point3f point1 = solidVertices[vertex1].getPosition();
+	Point3f point2 = solidVertices[vertex2].getPosition();
 	Vector3f edgeDirection({point2.x - point1.x, point2.y - point1.y, point2.z - point1.z});
 	Line edgeLine(edgeDirection, point1);
 	
 	if(index==0)
 	{
-		startVertex = vertex1;
+		sv = vertex1;
 		startType = EDGE;
 		startPos = line.computeLineIntersection(edgeLine);
 		startDist = line.computePointToPointDistance(startPos);
@@ -325,7 +328,7 @@ bool Segment::setEdge(const Vertex& vertex1, const Vertex& vertex2)
 	}
 	else if(index==1)
 	{
-		endVertex = vertex1;
+		ev = vertex1;
 		endType = EDGE;
 		endPos = line.computeLineIntersection(edgeLine);
 		endDist = line.computePointToPointDistance(endPos);
@@ -357,11 +360,22 @@ void Segment::swapEnds()
 	startType = endType;
 	endType = typeTemp;
 	
-	Vertex vertexTemp = startVertex;
-	startVertex = endVertex;
-	endVertex = vertexTemp;
+	int vertexTemp = sv;
+	sv = ev;
+	ev = vertexTemp;
 	
 	Point3f posTemp = startPos;
 	startPos = endPos;
 	endPos = posTemp;		
+}
+
+
+	
+/** nearest vertex from the starting point */
+Vertex& Segment::startVertex(){
+	return solidVertices[sv];
+}
+/** nearest vertex from the ending point */
+Vertex& Segment::endVertex(){
+	return solidVertices[ev];
 }

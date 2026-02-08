@@ -37,8 +37,8 @@ Line::Line(const Face& face1, const Face& face2)
 		//getting a line point, zero is set to a coordinate whose direction 
 		//component isn't zero (line intersecting its origin plan)
 		point = {};
-		double d1 = -(normalFace1.x*face1.v1.x + normalFace1.y*face1.v1.y + normalFace1.z*face1.v1.z);
-		double d2 = -(normalFace2.x*face2.v1.x + normalFace2.y*face2.v1.y + normalFace2.z*face2.v1.z);
+		double d1 = -(normalFace1.x*face1.v1().x + normalFace1.y*face1.v1().y + normalFace1.z*face1.v1().z);
+		double d2 = -(normalFace2.x*face2.v1().x + normalFace2.y*face2.v1().y + normalFace2.z*face2.v1().z);
 		if(abs(direction.x)>TOL)
 		{
 			point.x = 0;

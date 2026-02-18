@@ -54,7 +54,7 @@ Face::Face(std::vector<Vertex>& solidVertices, int v1, int v2, int v3)
  * @return cloned face object
  */
 Face::Face(const Face& other)
-	:v{other.v[1], other.v[2], other.v[3]}
+	:v{other.v[0], other.v[1], other.v[2]}
 	,status(other.status)
 	,solidVertices(other.solidVertices)
 {
@@ -62,9 +62,9 @@ Face::Face(const Face& other)
 
 
 Face& Face::operator=(const Face& other){
+	v[0] = other.v[0];
 	v[1] = other.v[1];
 	v[2] = other.v[2];
-	v[3] = other.v[3];
 	status = other.status;
 	return *this;
 }
@@ -76,7 +76,7 @@ Face& Face::operator=(const Face& other){
  */
 std::string Face::toString() const
 {
-	return v1().toString()+"\n"+v2().toString()+"\n"+v3().toString();
+	return v1().toString()+"\t"+v2().toString()+"\t"+v3().toString();
 }
 
 /**
@@ -88,7 +88,7 @@ std::string Face::toString() const
  */
 bool Face::equals(const Face& other) const
 {
-	for(int i = 1; i<=3; ++i){
+	for(int i = 0; i<=2; ++i){
 
 		if(!v1().equals(other.getVertex(i))) continue;
 
@@ -114,31 +114,31 @@ bool Face::equals(const Face& other) const
  */
 bool Face::operator!=(const Face& other) const
 {
-	return !((v[1]!=other.v[1]) || (v[2]!=other.v[2]) || (v[3]!=other.v[3]));
+	return ((v[0]!=other.v[0]) || (v[1]!=other.v[1]) || (v[2]!=other.v[2]));
 }
 
 //-------------------------------------GETS-------------------------------------//
 
 /** first vertex */
 Vertex& Face::v1(){
-	return solidVertices[v[2]];
+	return solidVertices[v[0]];
 }
 const Vertex& Face::v1()const{
-	return solidVertices[v[2]];
+	return solidVertices[v[0]];
 }
 /** second vertex */
 Vertex& Face::v2(){
-	return solidVertices[v[2]];
+	return solidVertices[v[1]];
 }
 const Vertex& Face::v2()const{
-	return solidVertices[v[2]];
+	return solidVertices[v[1]];
 }
 /** third vertex */
 Vertex& Face::v3(){
-	return solidVertices[v[3]];
+	return solidVertices[v[2]];
 }
 const Vertex& Face::v3()const{
-	return solidVertices[v[3]];
+	return solidVertices[v[2]];
 }
 
 /**
@@ -210,9 +210,9 @@ float Face::getArea() const
 /** Invert face direction (normal direction) */
 void Face::invert()
 {
-	int vertexTemp = v[2];
-	v[2] = v[1];
-	v[1] = vertexTemp;
+	int vertexTemp = v[1];
+	v[1] = v[0];
+	v[0] = vertexTemp;
 }
 	
 //------------------------------------CLASSIFIERS-------------------------------//
@@ -266,7 +266,7 @@ void Face::rayTraceClassify(Object3D& object)
 	bool success;
 	double dotProduct, distance; 
 	Point3f intersectionPoint;
-	Face closestFace(solidVertices); //construct invalid face
+	Face closestFace(object.vertices); //construct invalid face
 	double closestDistance; 
 								
 	do
@@ -277,16 +277,16 @@ void Face::rayTraceClassify(Object3D& object)
 		for(int i=0;i<object.getNumFaces();i++)
 		{
 			Face face = object.getFace(i);
-			dotProduct = this->getNormal().dot(ray.getDirection());
-			intersectionPoint = ray.computePlaneIntersection(this->getNormal(), this->v1().getPosition());
+			dotProduct = face.getNormal().dot(ray.getDirection());
+			intersectionPoint = ray.computePlaneIntersection(face.getNormal(), face.v1().getPosition());
 							
 			//if ray intersects the plane...  
-			if(intersectionPoint.isNAN())
+			if(!intersectionPoint.isNAN())
 			{
 				distance = ray.computePointToPointDistance(intersectionPoint);
 				
 				//if ray lies in plane...
-				if(abs(distance)<TOL && abs(dotProduct)<TOL)
+				if(std::abs(distance)<TOL && std::abs(dotProduct)<TOL)
 				{
 					//disturb the ray in order to not lie into another plane 
 					ray.perturbDirection();
@@ -295,10 +295,10 @@ void Face::rayTraceClassify(Object3D& object)
 				}
 				
 				//if ray starts in plane...
-				else if(abs(distance)<TOL && abs(dotProduct)>TOL)
+				else if(std::abs(distance)<TOL && std::abs(dotProduct)>TOL)
 				{
 					//if ray intersects the Face...
-					if(this->hasPoint(intersectionPoint))
+					if(face.hasPoint(intersectionPoint))
 					{
 						//faces coincide
 						closestFace = face;
@@ -308,12 +308,12 @@ void Face::rayTraceClassify(Object3D& object)
 				}
 				
 				//if ray intersects plane... 
-				else if(abs(dotProduct)>TOL && distance>TOL)
+				else if(std::abs(dotProduct)>TOL && distance>TOL)
 				{
 					if(distance<closestDistance)
 					{
 						//if ray intersects the face;
-						if(this->hasPoint(intersectionPoint))
+						if(face.hasPoint(intersectionPoint))
 						{
 							//this face is the closest face untill now
 							closestDistance = distance;
@@ -336,7 +336,7 @@ void Face::rayTraceClassify(Object3D& object)
 		dotProduct = closestFace.getNormal().dot(ray.getDirection());
 		
 		//distance = 0: coplanar faces
-		if(abs(closestDistance)<TOL)
+		if(std::abs(closestDistance)<TOL)
 		{
 			if(dotProduct>TOL)
 			{
@@ -377,7 +377,7 @@ bool Face::hasPoint(Point3f& point)
 	Vector3f normal = getNormal(); 
 
 	//if x is constant...	
-	if(abs(normal.x)>TOL) 
+	if(std::abs(normal.x)>TOL) 
 	{
 		//tests on the x plane
 		result1 = linePositionInX(point, v1().getPosition(), v2().getPosition());
@@ -386,7 +386,7 @@ bool Face::hasPoint(Point3f& point)
 	}
 	
 	//if y is constant...
-	else if(abs(normal.y)>TOL)
+	else if(std::abs(normal.y)>TOL)
 	{
 		//tests on the y plane
 		result1 = linePositionInY(point, v1().getPosition(), v2().getPosition());
@@ -428,7 +428,7 @@ bool Face::hasPoint(Point3f& point)
 int Face::linePositionInX(Point3f point, Point3f pointLine1, Point3f pointLine2)
 {
 	double a, b, z;
-	if((abs(pointLine1.y-pointLine2.y)>TOL)&&(((point.y>=pointLine1.y)&&(point.y<=pointLine2.y))||((point.y<=pointLine1.y)&&(point.y>=pointLine2.y))))
+	if((std::abs(pointLine1.y-pointLine2.y)>TOL)&&(((point.y>=pointLine1.y)&&(point.y<=pointLine2.y))||((point.y<=pointLine1.y)&&(point.y>=pointLine2.y))))
 	{
 		a = (pointLine2.z-pointLine1.z)/(pointLine2.y-pointLine1.y);
 		b = pointLine1.z - a*pointLine1.y;
@@ -464,7 +464,7 @@ int Face::linePositionInX(Point3f point, Point3f pointLine1, Point3f pointLine2)
 int Face::linePositionInY(Point3f point, Point3f pointLine1, Point3f pointLine2)
 {
 	double a, b, z;
-	if((abs(pointLine1.x-pointLine2.x)>TOL)&&(((point.x>=pointLine1.x)&&(point.x<=pointLine2.x))||((point.x<=pointLine1.x)&&(point.x>=pointLine2.x))))
+	if((std::abs(pointLine1.x-pointLine2.x)>TOL)&&(((point.x>=pointLine1.x)&&(point.x<=pointLine2.x))||((point.x<=pointLine1.x)&&(point.x>=pointLine2.x))))
 	{
 		a = (pointLine2.z-pointLine1.z)/(pointLine2.x-pointLine1.x);
 		b = pointLine1.z - a*pointLine1.x;
@@ -500,7 +500,7 @@ int Face::linePositionInY(Point3f point, Point3f pointLine1, Point3f pointLine2)
 int Face::linePositionInZ(Point3f point, Point3f pointLine1, Point3f pointLine2)
 {
 	double a, b, y;
-	if((abs(pointLine1.x-pointLine2.x)>TOL)&&(((point.x>=pointLine1.x)&&(point.x<=pointLine2.x))||((point.x<=pointLine1.x)&&(point.x>=pointLine2.x))))
+	if((std::abs(pointLine1.x-pointLine2.x)>TOL)&&(((point.x>=pointLine1.x)&&(point.x<=pointLine2.x))||((point.x<=pointLine1.x)&&(point.x>=pointLine2.x))))
 	{
 		a = (pointLine2.y-pointLine1.y)/(pointLine2.x-pointLine1.x);
 		b = pointLine1.y - a*pointLine1.x;
@@ -527,11 +527,11 @@ int Face::linePositionInZ(Point3f point, Point3f pointLine1, Point3f pointLine2)
 const Vertex& Face::getVertex(int id)const
 {
 	switch(id){
-		case 1:
+		case 0:
 			return v1();
-		case 2:
+		case 1:
 			return v2();
-		case 3:
+		case 2:
 			return v3();
 		default:
 			abort();

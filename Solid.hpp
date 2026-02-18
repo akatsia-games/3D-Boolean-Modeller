@@ -31,10 +31,13 @@ public:
 	void write(std::basic_ostream<char>& solidFile) const;
 
 	const std::vector<Point3f>& getVertices() const;
+	std::vector<Point3f>& getVertices();
 
 	const std::vector<int>& getIndices() const;
+	std::vector<int>& getIndices();
 
 	const std::vector<Colour3f>& getColors() const;
+	std::vector<Colour3f>& getColors();
 
 	bool isEmpty() const;
 
@@ -42,7 +45,7 @@ public:
 
 	void setData(const std::vector<Point3f>& vertices, const std::vector<int>& indices, Colour3f color);
 
-	void translate(double dx, double dy);
+	void translate(double dx, double dy, double dz);
 
 	void rotate(double dx, double dy);
 

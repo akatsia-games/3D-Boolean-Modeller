@@ -34,33 +34,33 @@ Segment::Segment(const Line& line, const Face& face, int sign1, int sign2, int s
 	//VERTEX is an end
 	if(sign1 == 0)
 	{
-		setVertex(face.v[1]);
+		setVertex(face.v[0]);
 		//other vertices on the same side - VERTEX-VERTEX VERTEX
 		if(sign2 == sign3)
 		{
-			setVertex(face.v[1]);
+			setVertex(face.v[0]);
 		}
 	}
 	
 	//VERTEX is an end
 	if(sign2 == 0)
 	{
-		setVertex(face.v[2]);
+		setVertex(face.v[1]);
 		//other vertices on the same side - VERTEX-VERTEX VERTEX
 		if(sign1 == sign3)
 		{
-			setVertex(face.v[2]);
+			setVertex(face.v[1]);
 		}
 	}
 	
 	//VERTEX is an end
 	if(sign3 == 0)
 	{
-		setVertex(face.v[3]);
+		setVertex(face.v[2]);
 		//other vertices on the same side - VERTEX-VERTEX VERTEX
 		if(sign1 == sign2)
 		{
-			setVertex(face.v[3]);
+			setVertex(face.v[2]);
 		}
 	}
 	
@@ -70,17 +70,17 @@ Segment::Segment(const Line& line, const Face& face, int sign1, int sign2, int s
 		//EDGE is an end
 		if((sign1==1 && sign2==-1)||(sign1==-1 && sign2==1))
 		{
-			setEdge(face.v[1], face.v[2]);
+			setEdge(face.v[0], face.v[1]);
 		}
 		//EDGE is an end
 		if((sign2==1 && sign3==-1)||(sign2==-1 && sign3==1))
 		{
-			setEdge(face.v[2], face.v[3]);
+			setEdge(face.v[1], face.v[2]);
 		}
 		//EDGE is an end
 		if((sign3==1 && sign1==-1)||(sign3==-1 && sign1==1))
 		{
-			setEdge(face.v[3], face.v[1]);
+			setEdge(face.v[2], face.v[0]);
 		}
 	}
 }

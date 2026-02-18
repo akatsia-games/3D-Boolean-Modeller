@@ -13,6 +13,9 @@
  * Translated to C++ by akatsia-games on github.com
  */
 
+ 
+std::vector<Vertex> Vertex::emptyVertexVector;
+
 /**
  * Constructs a vertex with unknown status
  * 
@@ -137,8 +140,7 @@ std::string Vertex::toString() const
  */
 bool Vertex::equals(const Vertex& other) const
 {
-	return 	abs(x-other.x)<TOL && abs(y-other.y)<TOL 
-			&& abs(z-other.z)<TOL && color.equals(other.color);
+	return 	(std::abs(x-other.x)<TOL) && (std::abs(y-other.y)<TOL) && (std::abs(z-other.z)<TOL) && color.equals(other.color);
 }
 
 /**
@@ -151,10 +153,12 @@ bool Vertex::equals(const Vertex& other) const
 bool Vertex::operator!=(const Vertex& other) const
 {
 
-	return 	(nextafter(x, INFINITY) >= other.x)
-		  &&(nextafter(x,-INFINITY) <= other.x)
-		  &&(nextafter(y, INFINITY) >= other.y)
-		  &&(nextafter(y,-INFINITY) <= other.y);
+	return 	(nextafter(x, INFINITY) < other.x)
+		  ||(nextafter(x,-INFINITY) > other.x)
+		  ||(nextafter(y, INFINITY) < other.y)
+		  ||(nextafter(y,-INFINITY) > other.y)
+		  ||(nextafter(z, INFINITY) < other.z)
+		  ||(nextafter(z,-INFINITY) > other.z);
 }
 
 //--------------------------------------SETS------------------------------------//
@@ -239,6 +243,8 @@ void Vertex::mark(int status)
 {
 	//mark vertex
 	this->status = status;
+	
+	if(status == Vertex::UNKNOWN) return ;
 
 	if(solidVertices.size() == 0) return;
 	

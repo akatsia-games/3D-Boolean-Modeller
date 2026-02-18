@@ -30,36 +30,37 @@ class Colour3f;
  */
 class Object3D
 {
+	friend Face;
 public:
 
 	Object3D(const Solid& solid);
 
 	Object3D(const Object3D& other);
 
-	int getNumFaces();
+	int getNumFaces() const;
 
 	const Face& getFace(int index) const;
 	Face& getFace(int index);
 
 	const Bound& getBound()const;
 
-	void splitFaces(Object3D object);
+	void splitFaces(const Object3D& object);
 
-	void classifyFaces(Object3D object);
+	void classifyFaces(Object3D& object);
 	
 	void invertInsideFaces();
 
 private:
 
+	double getTotalArea() const;
 
 	int addFace(int v1, int v2, int v3, int emplace = -1);
 
-	static int discardedIndex;
-	int addVertex(Point3f pos, Colour3f color, int status, int& index = discardedIndex);
+	int addVertex(Point3f pos, Colour3f color, int status);
 
 	double computeDistance(const Vertex& vertex, const Face& face)const;
 
-	void splitFace(int facePos, Segment segment1, Segment segment2);
+	void splitFace(int facePos, Segment& segment1, Segment& segment2);
 
 	void breakFaceInTwo(int facePos, Point3f newPos, int splitEdge);
 
@@ -76,7 +77,11 @@ private:
 	void breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Vertex endVertex);
 
 	void breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, int linedVertex);
-	
+
+#ifdef _DEBUG
+	void checkSplit(Face& original, int count);
+#endif
+
 	/** solid vertices  */
 	std::vector<Vertex> vertices;
 	/** solid faces */

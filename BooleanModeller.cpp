@@ -87,26 +87,15 @@ Solid BooleanModeller::composeSolid(int faceStatus1, int faceStatus2, int faceSt
 	groupObjectComponents(object1, vertices, indices, colors, faceStatus1, faceStatus2);
 	groupObjectComponents(object2, vertices, indices, colors, faceStatus3, faceStatus3);
 
-	//turn the arrayLists to arrays
+	//turn the Vertex vector to Point3f vector
 	std::vector<Point3f> verticesArray(vertices.size());
 	for(int i=0;i<vertices.size();i++)
 	{
 		verticesArray[i] = vertices[i].getPosition();
 	}
-	std::vector<int> indicesArray(indices.size());
-	for(int i=0;i<indices.size();i++)
-	{
-		//indicesArray[i] = ((Integer)indices.get(i)).intValue();
-		indicesArray[i] = indices[i];
-	}
-	std::vector<Colour3f> colorsArray(colors.size());
-	for(int i=0;i<colors.size();i++)
-	{
-		colorsArray[i] = colors[i];
-	}
 
 	//returns the solid containing the grouped elements
-	return Solid(verticesArray, indicesArray, colorsArray);
+	return Solid(verticesArray, indices, colors);
 }
 
 /**

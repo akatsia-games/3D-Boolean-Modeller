@@ -72,6 +72,10 @@ const std::vector<Point3f>& Solid::getVertices() const
 {
 	return vertices;
 }
+std::vector<Point3f>& Solid::getVertices()
+{
+	return vertices;
+}
 
 /** Gets the solid indices for its vertices
  * 
@@ -81,12 +85,21 @@ const std::vector<int>& Solid::getIndices() const
 {
 	return indices;
 }
+std::vector<int>& Solid::getIndices()
+{
+	return indices;
+}
 
 /** Gets the vertices colors
  * 
  * @return vertices colors
  */
 const std::vector<Colour3f>& Solid::getColors() const
+{
+	return colors;
+}
+
+std::vector<Colour3f>& Solid::getColors()
 {
 	return colors;
 }
@@ -144,7 +157,7 @@ void Solid::setData(const std::vector<Point3f>& vertices, const std::vector<int>
  * @param dx translation on the x axis
  * @param dy translation on the y axis
  */
-void Solid::translate(double dx, double dy)
+void Solid::translate(double dx, double dy, double dz)
 {
 	if(dx!=0||dy!=0)
 	{
@@ -152,6 +165,7 @@ void Solid::translate(double dx, double dy)
 		{
 			vertices[i].x += dx;
 			vertices[i].y += dy;
+			vertices[i].z += dz;
 		}
 		
 		defineGeometry();
@@ -280,7 +294,7 @@ void Solid::loadCoordinateFile(std::basic_istream<char>& solidFile, Colour3f col
 				
 	for(int i=0;i<numVertices;i++)
 	{
-		double x,y,z;
+		float x,y,z;
 		solidFile>>x>>y>>z;
 		vertices[i]= {(float)x, (float)y, (float)z};
 	}

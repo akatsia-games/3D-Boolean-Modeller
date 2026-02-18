@@ -16,6 +16,44 @@ public:
     float y;
     float z;
 
+    Vector3f& operator+=(Vector3f other){
+        x+=other.x;
+        y+=other.y;
+        z+=other.z;
+        return *this;
+    }
+
+    Vector3f& operator-=(Vector3f other){
+        x-=other.x;
+        y-=other.y;
+        z-=other.z;
+        return *this;
+    }
+
+    Vector3f& operator*=(double mult){
+        x*=mult;
+        y*=mult;
+        z*=mult;
+        return *this;
+    }
+
+    Vector3f operator+(Vector3f other){
+        other+= (*this);
+        return other;
+    }
+
+    Vector3f operator-(Vector3f other){
+        other-= (*this);
+        return other;
+    }
+
+    Vector3f operator*(double mult){
+        Vector3f cpy = *this;
+        cpy*=mult;
+        return cpy;
+    }
+
+
     double isNAN() const{
         return std::isnan(x)||std::isnan(y)||std::isnan(z);
     }
@@ -52,6 +90,26 @@ public:
         return acos(cos_res);
     }
 
+    void rotate(Vector3f other, double radians){
+        other.normalize();
+        double other_len = dot(other);
+
+        //remove the component of "this" that is "other"
+        (*this) -= other*other_len;
+
+        //save current length and normalize
+        double this_len = length();
+        normalize();
+
+        //generate a normalized cross product to the "right" of "this" as viewed from "other"
+        Vector3f sin_vec;
+        sin_vec.cross(*this,other);
+
+        //rotate the current vector and then resize it accordingly and add back the "other" component
+        *this = (*this)*cos(radians) + sin_vec*sin(radians);
+        *this = (*this) * this_len + other*other_len;
+    }
+
     std::string toString() const{
         return "(Vector3f x:"+std::to_string(x)+", y:"+std::to_string(y)+", z:"+std::to_string(z)+")";
     }
@@ -63,6 +121,10 @@ public:
     float x;
     float y;
     float z;
+
+    operator Vector3f() const{
+        return {x,y,z};
+    }
 
     double isNAN() const{
         return std::isnan(x)||std::isnan(y)||std::isnan(z);
@@ -86,7 +148,7 @@ public:
     float b;
 
     bool equals(const Colour3f& other)const{
-        return (abs(r-other.r)+abs(r+other.r)+abs(r+other.r)) < TOL;
+        return (std::abs(r-other.r)+std::abs(g-other.g)+std::abs(b-other.b)) < TOL;
     }
 
 private:

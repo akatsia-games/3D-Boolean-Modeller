@@ -114,6 +114,33 @@ bool Solid::isEmpty() const
 	return indices.size()==0;
 }	
 
+
+double Solid::signedTriangleVolume(Point3f p1, Point3f p2, Point3f p3)
+{
+    double v321 = p3.x*p2.y*p1.z;
+    double v231 = p2.x*p3.y*p1.z;
+    double v312 = p3.x*p1.y*p2.z;
+    double v132 = p1.x*p3.y*p2.z;
+    double v213 = p2.x*p1.y*p3.z;
+    double v123 = p1.x*p2.y*p3.z;
+    return (1.0/6.0)*(-v321 + v231 + v312 - v132 - v213 + v123);
+}
+
+/**
+ * Gets the volume of the solid
+ * 
+ * @return the volume of the solid
+ */
+double Solid::getVolume() const
+{
+    double volume = 0;
+	for(int i = 0; i<indices.size(); i+=3)
+	{
+		volume += signedTriangleVolume(vertices[indices[i]], vertices[indices[i+1]], vertices[indices[i+2]]);
+	}
+    return std::abs(volume);
+}
+
 //---------------------------------------SETS-----------------------------------//
 
 /**
@@ -259,6 +286,15 @@ void Solid::scale(double dx, double dy, double dz)
 	}
 	
 	defineGeometry();
+}
+
+Vector3f Solid::intersectRay(Vector3f position, Vector3f direction)
+{//work in progress
+	if(position.y > 1 != direction.y < 0){
+		return {NAN,NAN,NAN};
+	}
+	float k = (1-position.y)/direction.y;
+	return position + direction*k;
 }
 
 //-----------------------------------PRIVATES--------------------------------//

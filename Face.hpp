@@ -53,7 +53,7 @@ public:
 	
 	Face(std::vector<Vertex>& solidVertices);
 
-	Face(std::vector<Vertex>& solidVertices, int v1, int v2, int v3);
+	Face(std::vector<Vertex>& solidVertices, int v1, int v2, int v3, int testedUntil=0);
 	
 	Face(const Face& other);
 	
@@ -70,6 +70,8 @@ public:
 	int getStatus() const;
 	
 	float getArea() const;
+	
+	int getStart()const;
 	
 	void invert();
 		
@@ -97,6 +99,8 @@ private:
 
 	/** face status relative to a solid  */
 	int status;
+
+	int testedUntil;
 	
 	/** point status if it is up relative to an edge - see linePositionIn_ methods */
 	static const int UP = 6;

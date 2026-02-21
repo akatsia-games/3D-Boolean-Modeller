@@ -8,6 +8,7 @@
  * 
  * @author akatsia-games on github.com
  */
+class Point3f;
 
 class Vector3f
 {
@@ -52,6 +53,8 @@ public:
         cpy*=mult;
         return cpy;
     }
+
+    operator Point3f() const;
 
 
     double isNAN() const{
@@ -121,6 +124,10 @@ public:
     float x;
     float y;
     float z;
+
+    Point3f(float x, float y, float z):x(x),y(y),z(z){}
+    Point3f(int x, int y, int z):x((float)x),y((float)y),z((float)z){}
+    Point3f():x(0),y(0),z(0){}
 
     operator Vector3f() const{
         return {x,y,z};

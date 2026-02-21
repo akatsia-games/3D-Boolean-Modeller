@@ -15,6 +15,17 @@
 //---------------------------------CONSTRUCTORS---------------------------------//
 
 /**
+ * Bound NAN constructor
+ * 
+ */	
+Bound::Bound()
+{
+	xMax = xMin = NAN;
+	yMax = yMin = NAN;
+	zMax = zMin = NAN;
+}
+
+/**
  * Bound constructor for a face
  * 
  * @param p1 point relative to the first vertex
@@ -38,6 +49,12 @@ Bound::Bound(const Point3f& p1, const Point3f& p2, const Point3f& p3)
  */
 Bound::Bound(const std::vector<Point3f>& vertices)
 {
+	if(vertices.empty()){
+		xMax = xMin = NAN;
+		yMax = yMin = NAN;
+		zMax = zMin = NAN;
+		return;
+	}
 	xMax = xMin = vertices[0].x;
 	yMax = yMin = vertices[0].y;
 	zMax = zMin = vertices[0].z;
@@ -89,6 +106,9 @@ std::string Bound::toString() const
  */
 bool Bound::overlap(const Bound& bound) const
 {
+	if(std::isnan(xMin)||std::isnan(xMax)||std::isnan(yMin)||std::isnan(yMax)||std::isnan(zMin)||std::isnan(zMax)){
+		return false;
+	}
 	if((xMin>bound.xMax+TOL)||(xMax<bound.xMin-TOL)||(yMin>bound.yMax+TOL)||(yMax<bound.yMin-TOL)||(zMin>bound.zMax+TOL)||(zMax<bound.zMin-TOL))
 	{
 		return false;

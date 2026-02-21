@@ -60,23 +60,23 @@ private:
 
 	double computeDistance(const Vertex& vertex, const Face& face)const;
 
-	void splitFace(int facePos, Segment& segment1, Segment& segment2);
+	void splitFace(int facePos, Segment& segment1, Segment& segment2, int testedUntil);
 
-	void breakFaceInTwo(int facePos, Point3f newPos, int splitEdge);
+	void breakFaceInTwo(int facePos, Point3f newPos, int splitEdge, int testedUntil);
 
-	void breakFaceInTwo(int facePos, Point3f newPos, Vertex endVertex);
+	void breakFaceInTwo(int facePos, Point3f newPos, Vertex endVertex, int testedUntil);
 
-	void breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, int splitEdge);
+	void breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, int splitEdge, int testedUntil);
 
-	void breakFaceInThree(int facePos, Point3f newPos, Vertex endVertex);
+	void breakFaceInThree(int facePos, Point3f newPos, Vertex endVertex, int testedUntil);
 
-	void breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, Vertex startVertex, Vertex endVertex);
+	void breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, Vertex startVertex, Vertex endVertex, int testedUntil);
 
-	void breakFaceInThree(int facePos, Point3f newPos);
+	void breakFaceInThree(int facePos, Point3f newPos, int testedUntil);
 
-	void breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Vertex endVertex);
+	void breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Vertex endVertex, int testedUntil);
 
-	void breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, int linedVertex);
+	void breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, int linedVertex, int testedUntil);
 
 #ifdef _DEBUG
 	void checkSplit(Face& original, int count);

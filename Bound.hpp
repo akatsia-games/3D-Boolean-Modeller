@@ -21,6 +21,8 @@ class Bound
 public:
 	//---------------------------------CONSTRUCTORS---------------------------------//
 	
+	Bound();
+
 	/**
 	 * Bound constructor for a face
 	 * 

@@ -28,6 +28,7 @@
 Face::Face(std::vector<Vertex>& solidVertices)
 	:v{0,0,0}
 	,solidVertices(solidVertices)
+	,testedUntil(0)
 {
 	status = Face::INVALID;
 }
@@ -39,9 +40,10 @@ Face::Face(std::vector<Vertex>& solidVertices)
  * @param v2 a face vertex
  * @param v3 a face vertex
  */
-Face::Face(std::vector<Vertex>& solidVertices, int v1, int v2, int v3)
+Face::Face(std::vector<Vertex>& solidVertices, int v1, int v2, int v3, int testedUntil)
 	:v{v1, v2, v3}
 	,solidVertices(solidVertices)
+	,testedUntil(testedUntil)
 {
 	status = Face::UNKNOWN;
 }
@@ -57,6 +59,7 @@ Face::Face(const Face& other)
 	:v{other.v[0], other.v[1], other.v[2]}
 	,status(other.status)
 	,solidVertices(other.solidVertices)
+	,testedUntil(other.testedUntil)
 {
 }
 
@@ -66,6 +69,7 @@ Face& Face::operator=(const Face& other){
 	v[1] = other.v[1];
 	v[2] = other.v[2];
 	status = other.status;
+	testedUntil = other.testedUntil;
 	return *this;
 }
 
@@ -114,7 +118,7 @@ bool Face::equals(const Face& other) const
  */
 bool Face::operator!=(const Face& other) const
 {
-	return ((v[0]!=other.v[0]) || (v[1]!=other.v[1]) || (v[2]!=other.v[2]));
+	return ((v1()!=other.v1()) || (v2()!=other.v2()) || (v3()!=other.v3()));
 }
 
 //-------------------------------------GETS-------------------------------------//
@@ -203,6 +207,10 @@ float Face::getArea() const
 	double B = xy.angle(xz);
 	
 	return (a * c * sin(B))/2.0;
+}
+
+int Face::getStart() const{
+	return testedUntil;
 }
 
 //-------------------------------------OTHERS-----------------------------------//

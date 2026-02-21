@@ -41,6 +41,8 @@ public:
 
 	bool isEmpty() const;
 
+	double getVolume() const;
+
 	void setData(const std::vector<Point3f>& vertices, const std::vector<int>& indices, const std::vector<Colour3f>& colors);
 
 	void setData(const std::vector<Point3f>& vertices, const std::vector<int>& indices, Colour3f color);
@@ -53,7 +55,10 @@ public:
 
 	void scale(double dx, double dy, double dz);
 
+	Vector3f intersectRay(Vector3f position, Vector3f direction);
+
 protected:
+	static double signedTriangleVolume(Point3f p1, Point3f p2, Point3f p3);
 
 	void setInitialFeatures();
 

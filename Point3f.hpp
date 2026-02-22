@@ -13,9 +13,9 @@ class Point3f;
 class Vector3f
 {
 public:
-    float x;
-    float y;
-    float z;
+    double x;
+    double y;
+    double z;
 
     Vector3f& operator+=(Vector3f other){
         x+=other.x;
@@ -85,7 +85,7 @@ public:
         };
     }
 
-    float angle(Vector3f& other) const{
+    double angle(Vector3f& other) const{
         double this_len = length();
         double other_len = other.length();
         double dot_pr = this->dot(other);
@@ -121,12 +121,12 @@ public:
 class Point3f
 {
 public:
-    float x;
-    float y;
-    float z;
+    double x;
+    double y;
+    double z;
 
-    Point3f(float x, float y, float z):x(x),y(y),z(z){}
-    Point3f(int x, int y, int z):x((float)x),y((float)y),z((float)z){}
+    Point3f(double x, double y, double z):x(x),y(y),z(z){}
+    Point3f(int x, int y, int z):x((double)x),y((double)y),z((double)z){}
     Point3f():x(0),y(0),z(0){}
 
     operator Vector3f() const{
@@ -150,9 +150,9 @@ public:
 class Colour3f
 {
 public:
-    float r;
-    float g;
-    float b;
+    double r;
+    double g;
+    double b;
 
     bool equals(const Colour3f& other)const{
         return (std::abs(r-other.r)+std::abs(g-other.g)+std::abs(b-other.b)) < TOL;

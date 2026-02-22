@@ -54,7 +54,7 @@ private:
 
 	double getTotalArea() const;
 
-	int addFace(int v1, int v2, int v3, int emplace = -1);
+	int addFace(int v1, int v2, int v3, int testedUntil = 0);
 
 	int addVertex(Point3f pos, Colour3f color, int status);
 

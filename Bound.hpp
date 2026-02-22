@@ -54,6 +54,8 @@ public:
 	 * @return the string definition
 	 */
 	std::string toString() const;
+
+	Bound translate(double x, double y, double z);
 	
 	//--------------------------------------OTHERS----------------------------------//
 	

@@ -88,7 +88,7 @@ private:
 	static std::vector<Vertex> emptyVertexVector;
 	
 	/** tolerance value to test equalities */
-	constexpr static const double TOL = 1e-5f;
+	constexpr static const double TOL = 1e-5;
 };
 
 #endif //__VERTEX__

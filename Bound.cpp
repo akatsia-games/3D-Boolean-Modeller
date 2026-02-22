@@ -96,6 +96,21 @@ std::string Bound::toString() const
 		+"\nz: "+std::to_string(zMin)+" .. "+std::to_string(zMax);
 }
 
+Bound Bound::translate(double x, double y, double z){
+	xMax = xMax+x;
+	xMin = xMin+x;
+
+
+	yMax = yMax+y;
+	yMin = yMin+y;
+
+
+	zMax = zMax+z;
+	zMin = zMin+z;
+
+	return *this;
+}
+
 //--------------------------------------OTHERS----------------------------------//
 
 /**

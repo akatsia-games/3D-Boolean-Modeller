@@ -1,4 +1,5 @@
 #define _DEBUG
+//#define _PREVENT_INFINITE
 
 #include"Object3D.hpp"
 
@@ -156,16 +157,16 @@ int Object3D::addFace(int v1, int v2, int v3, int testedUntil)
 	{
 		Face face(vertices, v1, v2, v3, testedUntil);
 		
-		int i;
-		/*for(i=0;i<faces.size();i++)
+		#ifdef _PREVENT_INFINITE
+		for(int i=0; i<faces.size(); i++)
 		{
 			if(face.equals(faces[i])) break;			
 		}
-		if(i != faces.size()) return emplace;*/
+		#endif
 
 		if(face.getArea()>TOL)
 		{
-			faces.push_back(face);
+			faces.emplace_back(vertices, v1, v2, v3, testedUntil);
 			return 0;
 		}
 		else
@@ -195,7 +196,7 @@ int Object3D::addVertex(Point3f pos, Colour3f color, int status)
 	Vertex vertex(vertices,pos, color, status);
 	for(i=0;i<vertices.size();i++)
 	{
-		if(vertex.equals(vertices[i])&&vertices[i].getColor().equals(color)) break;			
+		if(vertex.equals(vertices[i]) && vertices[i].getColor().equals(color)) break;			
 	}
 
 	if(i==vertices.size())
@@ -319,12 +320,14 @@ void Object3D::splitFaces(const Object3D& object)
 									
 																		
 									#ifdef _DEBUG
+									#ifdef _PREVENT_INFINITE
 									//prevent from infinite loop (with a loss of faces...)
 									if(numFacesStart*20<getNumFaces())
 									{
 										fprintf(stderr,"possible infinite loop situation: terminating faces split\n");
 										return;
 									}
+									#endif
 									#endif
 							
 									//if the face in the position isn't the same, there was a break 
@@ -386,12 +389,14 @@ void Object3D::splitFace(int facePos, Segment& segment1, Segment& segment2, int 
 		startDist = segment2.getStartDistance();
 		startType = segment1.getIntermediateType();
 		startPos = segment2.getStartPosition();
+		fprintf(stderr,"start_segment2");
 	}
 	else
 	{
 		startDist = segment1.getStartDistance();
 		startType = segment1.getStartType();
 		startPos = segment1.getStartPosition();
+		fprintf(stderr,"start_segment1");
 	}
 	
 	//ending point: deepest ending point
@@ -400,12 +405,14 @@ void Object3D::splitFace(int facePos, Segment& segment1, Segment& segment2, int 
 		endDist = segment2.getEndDistance();
 		endType = segment1.getIntermediateType();
 		endPos = segment2.getEndPosition();
+		fprintf(stderr,"end_segment2");
 	}
 	else
 	{
 		endDist = segment1.getEndDistance();
 		endType = segment1.getEndType();
 		endPos = segment1.getEndPosition();
+		fprintf(stderr,"end_segment1");
 	}		
 	middleType = segment1.getIntermediateType();
 	
@@ -530,27 +537,30 @@ void Object3D::splitFace(int facePos, Segment& segment1, Segment& segment2, int 
 		//gets the vertex more lined with the intersection segment
 		int linedVertex;
 		Point3f linedVertexPos;
-		Vector3f   vertexVector({(float)(endPos.x-face.v1().x), (float)(endPos.y-face.v1().y), (float)(endPos.z-face.v1().z)});
+		Vector3f   vertexVector({(double)(endPos.x-face.v1().x), (double)(endPos.y-face.v1().y), (double)(endPos.z-face.v1().z)});
 		vertexVector.normalize();
 		double dot1 = std::abs(segmentVector.dot(vertexVector));
-		vertexVector = Vector3f({(float)(endPos.x-face.v2().x), (float)(endPos.y-face.v2().y), (float)(endPos.z-face.v2().z)});
+		vertexVector = Vector3f({(double)(endPos.x-face.v2().x), (double)(endPos.y-face.v2().y), (double)(endPos.z-face.v2().z)});
 		vertexVector.normalize();
 		double dot2 = std::abs(segmentVector.dot(vertexVector));
-		vertexVector = Vector3f({(float)(endPos.x-face.v3().x), (float)(endPos.y-face.v3().y), (float)(endPos.z-face.v3().z)});
+		vertexVector = Vector3f({(double)(endPos.x-face.v3().x), (double)(endPos.y-face.v3().y), (double)(endPos.z-face.v3().z)});
 		vertexVector.normalize();
 		double dot3 = std::abs(segmentVector.dot(vertexVector));
 		if (dot1 > dot2 && dot1 > dot3)
 		{
+			fprintf(stderr,"dot1_");
 			linedVertex = 1;
 			linedVertexPos = face.v1().getPosition();
 		}
 		else if (dot2 > dot3 && dot2 > dot1)
 		{
+			fprintf(stderr,"dot2_");
 			linedVertex = 2;
 			linedVertexPos = face.v2().getPosition();
 		}
 		else
 		{
+			fprintf(stderr,"dot3_");
 			linedVertex = 3;
 			linedVertexPos = face.v3().getPosition();
 		}
@@ -558,18 +568,21 @@ void Object3D::splitFace(int facePos, Segment& segment1, Segment& segment2, int 
 		// Now find which of the intersection endpoints is nearest to that vertex.
 		if (linedVertexPos.distance(startPos) > linedVertexPos.distance(endPos))
 		{
+			fprintf(stderr," near1_");
 			breakFaceInFive(facePos, startPos, endPos, linedVertex, testedUntil);
 		}
 		else
 		{
+			fprintf(stderr," near2_");
 			breakFaceInFive(facePos, endPos, startPos, linedVertex, testedUntil);
 		}
 	}
 }
 
 #ifdef _DEBUG
-void Object3D::checkSplit(Face& original, int count){
+void Object3D::checkSplit(Face& original, int start_faces){
 	double originalArea = original.getArea();
+	int count = (faces.size()-start_faces)+1;
 	double newArea = 0;
 
 	auto it = faces.rbegin();
@@ -578,15 +591,16 @@ void Object3D::checkSplit(Face& original, int count){
 		newArea+= it->getArea();
 	}
 
-	if(std::abs(originalArea - newArea)>TOL){
-		std::cout<<"\noriginal: \t"<<original.toString()<<std::endl;
+	if(std::abs(originalArea - newArea)>1e-5){
+		std::cout<<"\noriginal( \t"<<original.toString()<<" )"<<std::endl;
 		
 		it = faces.rbegin();
 		for(int i = 0; i<count; ++i, it++)
 		{
-			std::cout<<"new"<<(count-i)<<": \t\t"<<it->toString()<<std::endl;
+			std::cout<<"newTriangle("<<(count-i)<<", "<<it->toString()<<" )"<<std::endl;
 		}
 
+		std::cout<<"";
 
 	}
 }
@@ -594,13 +608,15 @@ void Object3D::checkSplit(Face& original, int count){
 
 #ifndef _DEBUG
 #define REMOVE(faces, facepos)\
+int current_faces = 0;\
 faces[facepos] = faces.back();\
 faces.pop_back();
 #elifdef _DEBUG
 #define REMOVE(faces, facepos)\
+int current_faces = faces.size();\
 faces[facepos] = faces.back();\
 faces.pop_back();\
-std::cerr<<__FUNCTION__<<__LINE__<<": ";
+std::cerr<<__FUNCTION__<<__LINE__<<":";
 #endif
 
 	
@@ -633,7 +649,7 @@ void Object3D::breakFaceInTwo(int facePos, Point3f newPos, int splitEdge, int te
 		addFace(face.v[2], vertex, face.v[1], testedUntil);
 		addFace(vertex, face.v[0], face.v[1], testedUntil);
 	}
-	checkSplit(face,2);
+	checkSplit(face,current_faces);
 }
 
 /**
@@ -665,7 +681,7 @@ void Object3D::breakFaceInTwo(int facePos, Point3f newPos, Vertex endVertex, int
 		addFace(face.v[2], vertex, face.v[1], testedUntil);
 		addFace(vertex, face.v[0], face.v[1], testedUntil);
 	}
-	checkSplit(face,2);
+	checkSplit(face,current_faces);
 }
 
 /**
@@ -702,7 +718,7 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, i
 		addFace(vertex1, vertex2, face.v[1], testedUntil);
 		addFace(vertex2, face.v[0], face.v[1], testedUntil);
 	}
-	checkSplit(face,3);
+	checkSplit(face,current_faces);
 }
 	
 /**
@@ -737,7 +753,7 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos, Vertex endVertex, i
 		addFace(face.v[0], face.v[1], vertex, testedUntil);
 		addFace(face.v[1], face.v[2], vertex, testedUntil);
 	}
-	checkSplit(face,3);
+	checkSplit(face,current_faces);
 }
 
 /**
@@ -793,7 +809,7 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, V
 		addFace(face.v[2], vertex1, face.v[1], testedUntil);
 		addFace(vertex2, face.v[0], vertex1, testedUntil);
 	}
-	checkSplit(face,3);
+	checkSplit(face,current_faces);
 }
 	
 /**
@@ -813,7 +829,7 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos, int testedUntil)
 	addFace(face.v[1], face.v[2], vertex, testedUntil);
 	addFace(face.v[2], face.v[0], vertex, testedUntil);
 	
-	checkSplit(face,3);
+	checkSplit(face,current_faces);
 }
 
 /**
@@ -853,7 +869,7 @@ void Object3D::breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Ve
 		addFace(face.v[0], face.v[1], vertex2, testedUntil);
 		addFace(face.v[1], face.v[2], vertex2, testedUntil);
 	}
-	checkSplit(face,4);
+	checkSplit(face,current_faces);
 
 }
 
@@ -892,6 +908,7 @@ void Object3D::breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, in
 	}
 	else
 	{
+		fprintf(stderr,"_else");
 		addFace(face.v[0], face.v[1], vertex1, testedUntil);
 		addFace(face.v[0], vertex1, vertex2, testedUntil);
 		addFace(face.v[1], vertex2, vertex1, testedUntil);
@@ -899,7 +916,7 @@ void Object3D::breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, in
 		addFace(face.v[1], face.v[2], vertex2, testedUntil);
 	}
 	
-	checkSplit(face,5);
+	checkSplit(face,current_faces);
 }
 
 //-----------------------------------OTHERS-------------------------------------//

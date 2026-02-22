@@ -293,7 +293,7 @@ Vector3f Solid::intersectRay(Vector3f position, Vector3f direction)
 	if(position.y > 1 != direction.y < 0){
 		return {NAN,NAN,NAN};
 	}
-	float k = (1-position.y)/direction.y;
+	double k = (1-position.y)/direction.y;
 	return position + direction*k;
 }
 
@@ -330,9 +330,9 @@ void Solid::loadCoordinateFile(std::basic_istream<char>& solidFile, Colour3f col
 				
 	for(int i=0;i<numVertices;i++)
 	{
-		float x,y,z;
+		double x,y,z;
 		solidFile>>x>>y>>z;
-		vertices[i]= {(float)x, (float)y, (float)z};
+		vertices[i]= {(double)x, (double)y, (double)z};
 	}
 	
 	int numTriangles;

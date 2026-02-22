@@ -128,7 +128,7 @@ Vertex::Vertex()
  */
 std::string Vertex::toString() const
 {
-	return "("+std::to_string(x)+", "+std::to_string(y)+", "+std::to_string(z)+")";
+	return "["+std::to_string(x)+", "+std::to_string(y)+", "+std::to_string(z)+"]";
 }
 
 /**
@@ -185,7 +185,7 @@ void Vertex::setStatus(int status)
  */
 Point3f Vertex::getPosition() const
 {
-	return {(float)x, (float)y, (float)z};
+	return {(double)x, (double)y, (double)z};
 } 
 
 /**

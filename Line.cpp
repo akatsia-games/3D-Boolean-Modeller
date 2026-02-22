@@ -215,7 +215,7 @@ Point3f Line::computeLineIntersection(const Line& otherLine) const
 	double y = point.y + direction.y*t;
 	double z = point.z + direction.z*t;
 			
-	return {(float)x,(float)y,(float)z};
+	return {x,y,z};
 }
 
 /**

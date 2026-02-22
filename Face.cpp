@@ -80,7 +80,7 @@ Face& Face::operator=(const Face& other){
  */
 std::string Face::toString() const
 {
-	return v1().toString()+"\t"+v2().toString()+"\t"+v3().toString();
+	return v1().toString()+", "+v2().toString()+", "+v3().toString();
 }
 
 /**
@@ -193,7 +193,7 @@ int Face::getStatus() const
  * 
  * @return face area
  */
-float Face::getArea() const
+double Face::getArea() const
 {
 	//area = (a * c * sen(B))/2
 	Point3f p1 = v1().getPosition();

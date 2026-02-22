@@ -69,7 +69,7 @@ public:
 	
 	int getStatus() const;
 	
-	float getArea() const;
+	double getArea() const;
 	
 	int getStart()const;
 	

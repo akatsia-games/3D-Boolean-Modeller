@@ -1,4 +1,4 @@
-#define _DEBUG
+//#define _DEBUG
 //#define _PREVENT_INFINITE
 
 #include"Object3D.hpp"

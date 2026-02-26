@@ -22,7 +22,7 @@ std::vector<Vertex> Vertex::emptyVertexVector;
  * @param position vertex position
  * @param color vertex color
  */
-Vertex::Vertex(std::vector<Vertex>& solidVertices, Point3f position, Colour3f color)
+Vertex::Vertex(std::vector<Vertex>& solidVertices, Point3d position, Colour3f color)
 	:solidVertices(solidVertices)
 {
 	this->color = color;
@@ -61,7 +61,7 @@ Vertex::Vertex(std::vector<Vertex>& solidVertices, double x, double y, double z,
  * @param color vertex color
  * @param status vertex status - UNKNOWN, BOUNDARY, INSIDE or OUTSIDE
  */
-Vertex::Vertex(std::vector<Vertex>& solidVertices, Point3f position, Colour3f color, int status)
+Vertex::Vertex(std::vector<Vertex>& solidVertices, Point3d position, Colour3f color, int status)
 	:solidVertices(solidVertices)
 {
 	this->color = color;
@@ -183,7 +183,7 @@ void Vertex::setStatus(int status)
  * 
  * @return vertex position
  */
-Point3f Vertex::getPosition() const
+Point3d Vertex::getPosition() const
 {
 	return {(double)x, (double)y, (double)z};
 } 

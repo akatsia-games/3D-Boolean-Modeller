@@ -1,7 +1,7 @@
 #ifndef __LINE_HPP__
 #define __LINE_HPP__
 
-#include"Point3f.hpp"
+#include"Point3d.hpp"
 #include"Face.hpp"
 #include<string>
 
@@ -21,7 +21,7 @@ class Line
 public:
 	Line(const Face& face1, const Face& face2);
 	
-	Line(Vector3f direction, Point3f point);
+	Line(Vector3d direction, Point3d point);
 	
 	Line(const Line& other);
 	
@@ -31,27 +31,27 @@ public:
 
 	std::string toString() const;
 
-	Point3f getPoint() const;
+	Point3d getPoint() const;
 
-	Vector3f getDirection() const;
+	Vector3d getDirection() const;
 
-	void setPoint(Point3f point);
+	void setPoint(Point3d point);
 
-	void setDirection(Vector3f direction);
+	void setDirection(Vector3d direction);
 
-	double computePointToPointDistance(const Point3f& otherPoint) const;
+	double computePointToPointDistance(const Point3d& otherPoint) const;
 
-	Point3f computeLineIntersection(const Line& otherLine) const;
+	Point3d computeLineIntersection(const Line& otherLine) const;
 
-	Point3f computePlaneIntersection(const Vector3f& normal, const Point3f& planePoint) const;
+	Point3d computePlaneIntersection(const Vector3d& normal, const Point3d& planePoint) const;
 
 	void perturbDirection();
 	
 private:
 	/** a line point */
-	Point3f point;
+	Point3d point;
 	/** line direction */
-	Vector3f direction;
+	Vector3d direction;
 	
 	/** tolerance value to test equalities */
 	constexpr static const double TOL = 1e-10;

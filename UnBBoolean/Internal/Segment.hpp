@@ -59,9 +59,9 @@ public:
 
 	int getNumEndsSet();
 
-	Point3f getStartPosition();
+	Point3d getStartPosition();
 
-	Point3f getEndPosition();
+	Point3d getEndPosition();
 
 	bool intersect(Segment& segment);
 	
@@ -103,9 +103,9 @@ private:
 	Vertex& endVertex(); 
 	
 	/** start of the intersection point */
-	Point3f startPos;
+	Point3d startPos;
 	/** end of the intersection point */
-	Point3f endPos;
+	Point3d endPos;
 	
 	/** tolerance value to test equalities */
 	constexpr static const double TOL = 1e-10f;

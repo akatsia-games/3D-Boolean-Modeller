@@ -212,7 +212,7 @@ int Segment::getNumEndsSet()
  * 
  * @return start position
  */
-Point3f Segment::getStartPosition()
+Point3d Segment::getStartPosition()
 {
 	return startPos;
 }
@@ -222,7 +222,7 @@ Point3f Segment::getStartPosition()
  * 
  * @return ending position
  */
-Point3f Segment::getEndPosition()
+Point3d Segment::getEndPosition()
 {
 	return endPos;
 }
@@ -311,9 +311,9 @@ bool Segment::setVertex(int vertex_id)
  */
 bool Segment::setEdge(int vertex1, int vertex2)
 {
-	Point3f point1 = solidVertices[vertex1].getPosition();
-	Point3f point2 = solidVertices[vertex2].getPosition();
-	Vector3f edgeDirection({point2.x - point1.x, point2.y - point1.y, point2.z - point1.z});
+	Point3d point1 = solidVertices[vertex1].getPosition();
+	Point3d point2 = solidVertices[vertex2].getPosition();
+	Vector3d edgeDirection({point2.x - point1.x, point2.y - point1.y, point2.z - point1.z});
 	Line edgeLine(edgeDirection, point1);
 	
 	if(index==0)
@@ -364,7 +364,7 @@ void Segment::swapEnds()
 	sv = ev;
 	ev = vertexTemp;
 	
-	Point3f posTemp = startPos;
+	Point3d posTemp = startPos;
 	startPos = endPos;
 	endPos = posTemp;		
 }

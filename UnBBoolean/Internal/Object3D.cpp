@@ -4,7 +4,7 @@
 #include"Object3D.hpp"
 
 #include"Solid.hpp"
-#include"Point3f.hpp"
+#include"Point3d.hpp"
 #include"Face.hpp"
 #include"Segment.hpp"
 
@@ -42,7 +42,7 @@ Face Object3D::nullFace(Object3D::emptyVertices);
 Object3D::Object3D(const Solid& solid)
 	:bound(solid.getVertices())
 {
-	const std::vector<Point3f>& verticesPoints = solid.getVertices();
+	const std::vector<Point3d>& verticesPoints = solid.getVertices();
 	const std::vector<int>& indices = solid.getIndices();
 	const std::vector<Colour3f>& colors = solid.getColors();
 	std::vector<int> indexOfSolidVertices;
@@ -189,7 +189,7 @@ int Object3D::addFace(int v1, int v2, int v3, int testedUntil)
  * @param index - return index
  * @return the vertex inserted (if a similar vertex already exists, this is returned)
  */
-int Object3D::addVertex(Point3f pos, Colour3f color, int status)
+int Object3D::addVertex(Point3d pos, Colour3f color, int status)
 {
 	int i;
 	//if already there is an equal vertex, it is not inserted
@@ -355,7 +355,7 @@ void Object3D::splitFaces(const Object3D& object)
  */
 double Object3D::computeDistance(const Vertex& vertex, const Face& face) const
 {
-	Vector3f normal = face.getNormal();
+	Vector3d normal = face.getNormal();
 	double a = normal.x;
 	double b = normal.y;
 	double c = normal.z;
@@ -375,7 +375,7 @@ double Object3D::computeDistance(const Vertex& vertex, const Face& face) const
 void Object3D::splitFace(int facePos, Segment& segment1, Segment& segment2, int testedUntil)
 {
 	Vertex startPosVertex, endPosVertex;
-	Point3f startPos, endPos;
+	Point3d startPos, endPos;
 	int startType, endType, middleType;
 	double startDist, endDist;
 	
@@ -525,7 +525,7 @@ void Object3D::splitFace(int facePos, Segment& segment1, Segment& segment2, int 
 	//FACE-FACE-FACE
 	else if (startType == Segment::FACE && endType == Segment::FACE)
 	{
-		Vector3f segmentVector({startPos.x-endPos.x, startPos.y-endPos.y, startPos.z-endPos.z});
+		Vector3d segmentVector({startPos.x-endPos.x, startPos.y-endPos.y, startPos.z-endPos.z});
 					
 		//if the intersection segment is a point only...
 		if (std::abs(segmentVector.x)<TOL && std::abs(segmentVector.y)<TOL && std::abs(segmentVector.z)<TOL)
@@ -536,14 +536,14 @@ void Object3D::splitFace(int facePos, Segment& segment1, Segment& segment2, int 
 		
 		//gets the vertex more lined with the intersection segment
 		int linedVertex;
-		Point3f linedVertexPos;
-		Vector3f   vertexVector({(double)(endPos.x-face.v1().x), (double)(endPos.y-face.v1().y), (double)(endPos.z-face.v1().z)});
+		Point3d linedVertexPos;
+		Vector3d   vertexVector({(double)(endPos.x-face.v1().x), (double)(endPos.y-face.v1().y), (double)(endPos.z-face.v1().z)});
 		vertexVector.normalize();
 		double dot1 = std::abs(segmentVector.dot(vertexVector));
-		vertexVector = Vector3f({(double)(endPos.x-face.v2().x), (double)(endPos.y-face.v2().y), (double)(endPos.z-face.v2().z)});
+		vertexVector = Vector3d({(double)(endPos.x-face.v2().x), (double)(endPos.y-face.v2().y), (double)(endPos.z-face.v2().z)});
 		vertexVector.normalize();
 		double dot2 = std::abs(segmentVector.dot(vertexVector));
-		vertexVector = Vector3f({(double)(endPos.x-face.v3().x), (double)(endPos.y-face.v3().y), (double)(endPos.z-face.v3().z)});
+		vertexVector = Vector3d({(double)(endPos.x-face.v3().x), (double)(endPos.y-face.v3().y), (double)(endPos.z-face.v3().z)});
 		vertexVector.normalize();
 		double dot3 = std::abs(segmentVector.dot(vertexVector));
 		if (dot1 > dot2 && dot1 > dot3)
@@ -627,7 +627,7 @@ std::cerr<<__FUNCTION__<<__LINE__<<":";
  * @param newPos new vertex position
  * @param edge that will be split 
  */		
-void Object3D::breakFaceInTwo(int facePos, Point3f newPos, int splitEdge, int testedUntil)
+void Object3D::breakFaceInTwo(int facePos, Point3d newPos, int splitEdge, int testedUntil)
 {
 	Face face = faces[facePos];
 	REMOVE(faces,facePos);
@@ -659,7 +659,7 @@ void Object3D::breakFaceInTwo(int facePos, Point3f newPos, int splitEdge, int te
  * @param newPos new vertex position
  * @param endVertex vertex used for splitting 
  */		
-void Object3D::breakFaceInTwo(int facePos, Point3f newPos, Vertex endVertex, int testedUntil)
+void Object3D::breakFaceInTwo(int facePos, Point3d newPos, Vertex endVertex, int testedUntil)
 {
 	Face face = faces[facePos];
 	REMOVE(faces,facePos);
@@ -692,7 +692,7 @@ void Object3D::breakFaceInTwo(int facePos, Point3f newPos, Vertex endVertex, int
  * @param newPos2 new vertex position 
  * @param splitEdge edge that will be split
  */
-void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, int splitEdge, int testedUntil)
+void Object3D::breakFaceInThree(int facePos, Point3d newPos1, Point3d newPos2, int splitEdge, int testedUntil)
 {
 	Face face = faces[facePos];
 	REMOVE(faces,facePos);
@@ -728,7 +728,7 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, i
  * @param newPos new vertex position
  * @param endVertex vertex used for the split
  */
-void Object3D::breakFaceInThree(int facePos, Point3f newPos, Vertex endVertex, int testedUntil)
+void Object3D::breakFaceInThree(int facePos, Point3d newPos, Vertex endVertex, int testedUntil)
 {
 	Face face = faces[facePos];
 	REMOVE(faces,facePos);
@@ -765,7 +765,7 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos, Vertex endVertex, i
  * @param startVertex vertex used the new faces creation
  * @param endVertex vertex used for the new faces creation
  */
-void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, Vertex startVertex, Vertex endVertex, int testedUntil)
+void Object3D::breakFaceInThree(int facePos, Point3d newPos1, Point3d newPos2, Vertex startVertex, Vertex endVertex, int testedUntil)
 {
 	Face face = faces[facePos];
 	REMOVE(faces,facePos);
@@ -818,7 +818,7 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, V
  * @param facePos face position on the faces array
  * @param newPos new vertex position
  */
-void Object3D::breakFaceInThree(int facePos, Point3f newPos, int testedUntil)
+void Object3D::breakFaceInThree(int facePos, Point3d newPos, int testedUntil)
 {
 	Face face = faces[facePos];
 	REMOVE(faces,facePos);
@@ -840,7 +840,7 @@ void Object3D::breakFaceInThree(int facePos, Point3f newPos, int testedUntil)
  * @param newPos2 new vertex position 
  * @param endVertex vertex used for the split
  */	
-void Object3D::breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Vertex endVertex, int testedUntil)
+void Object3D::breakFaceInFour(int facePos, Point3d newPos1, Point3d newPos2, Vertex endVertex, int testedUntil)
 {
 	Face face = faces[facePos];
 	REMOVE(faces,facePos);
@@ -881,7 +881,7 @@ void Object3D::breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Ve
  * @param newPos2 new vertex position 
  * @param linedVertex what vertex is more lined with the interersection found
  */		
-void Object3D::breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, int linedVertex, int testedUntil)
+void Object3D::breakFaceInFive(int facePos, Point3d newPos1, Point3d newPos2, int linedVertex, int testedUntil)
 {
 	Face face = faces[facePos];
 	REMOVE(faces,facePos);

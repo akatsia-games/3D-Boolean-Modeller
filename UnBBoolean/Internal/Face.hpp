@@ -2,8 +2,8 @@
 #define __FACE__
 
 #include"Vertex.hpp"
-#include"Point3f.hpp"
-#include"Bound.hpp"
+#include"UnBBoolean/Helpers/Point3d.hpp"
+#include"UnBBoolean/Helpers/Bound.hpp"
 #include<string>
 
 class Object3D;
@@ -65,7 +65,7 @@ public:
 	
 	Bound getBound() const;
 	
-	Vector3f getNormal() const;
+	Vector3d getNormal() const;
 	
 	int getStatus() const;
 	
@@ -82,13 +82,13 @@ public:
 	void rayTraceClassify(Object3D& object);
 	
 private:
-	bool hasPoint(Point3f& point);
+	bool hasPoint(Point3d& point);
 
-	static int linePositionInX(Point3f point, Point3f pointLine1, Point3f pointLine2);
+	static int linePositionInX(Point3d point, Point3d pointLine1, Point3d pointLine2);
 
-	static int linePositionInY(Point3f point, Point3f pointLine1, Point3f pointLine2);
+	static int linePositionInY(Point3d point, Point3d pointLine1, Point3d pointLine2);
 
-	static int linePositionInZ(Point3f point, Point3f pointLine1, Point3f pointLine2);
+	static int linePositionInZ(Point3d point, Point3d pointLine1, Point3d pointLine2);
 
 	const Vertex& getVertex(int id)const;
 

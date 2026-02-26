@@ -32,7 +32,7 @@ Bound::Bound()
  * @param p2 point relative to the second vertex
  * @param p3 point relative to the third vertex
  */	
-Bound::Bound(const Point3f& p1, const Point3f& p2, const Point3f& p3)
+Bound::Bound(const Point3d& p1, const Point3d& p2, const Point3d& p3)
 {
 	xMax = xMin = p1.x;
 	yMax = yMin = p1.y;
@@ -47,7 +47,7 @@ Bound::Bound(const Point3f& p1, const Point3f& p2, const Point3f& p3)
  * 
  * @param vertices the object vertices
  */
-Bound::Bound(const std::vector<Point3f>& vertices)
+Bound::Bound(const std::vector<Point3d>& vertices)
 {
 	if(vertices.empty()){
 		xMax = xMin = NAN;
@@ -59,7 +59,7 @@ Bound::Bound(const std::vector<Point3f>& vertices)
 	yMax = yMin = vertices[0].y;
 	zMax = zMin = vertices[0].z;
 	
-	for(const Point3f& vertex: vertices)
+	for(const Point3d& vertex: vertices)
 	{
 		checkVertex(vertex);
 	}
@@ -141,7 +141,7 @@ bool Bound::overlap(const Bound& bound) const
  * 
  * @param vertex vertex to be tested
  */
-void Bound::checkVertex(const Point3f& vertex)
+void Bound::checkVertex(const Point3d& vertex)
 {
 	if(vertex.x>xMax)
 	{

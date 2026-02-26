@@ -161,16 +161,16 @@ Bound Face::getBound() const
  * 
  * @return face normal
  */
-Vector3f Face::getNormal() const
+Vector3d Face::getNormal() const
 {
-	Point3f p1 = v1().getPosition();
-	Point3f p2 = v2().getPosition();
-	Point3f p3 = v3().getPosition();
+	Point3d p1 = v1().getPosition();
+	Point3d p2 = v2().getPosition();
+	Point3d p3 = v3().getPosition();
 	
-	Vector3f xy = {p2.x-p1.x, p2.y-p1.y, p2.z-p1.z};
-	Vector3f xz = {p3.x-p1.x, p3.y-p1.y, p3.z-p1.z};
+	Vector3d xy = {p2.x-p1.x, p2.y-p1.y, p2.z-p1.z};
+	Vector3d xz = {p3.x-p1.x, p3.y-p1.y, p3.z-p1.z};
 	
-	Vector3f normal;
+	Vector3d normal;
 	
 	normal.cross(xy,xz);
 	normal.normalize();
@@ -196,11 +196,11 @@ int Face::getStatus() const
 double Face::getArea() const
 {
 	//area = (a * c * sen(B))/2
-	Point3f p1 = v1().getPosition();
-	Point3f p2 = v2().getPosition();
-	Point3f p3 = v3().getPosition();
-	Vector3f xy = {p2.x-p1.x, p2.y-p1.y, p2.z-p1.z};
-	Vector3f xz = {p3.x-p1.x, p3.y-p1.y, p3.z-p1.z};
+	Point3d p1 = v1().getPosition();
+	Point3d p2 = v2().getPosition();
+	Point3d p3 = v3().getPosition();
+	Vector3d xy = {p2.x-p1.x, p2.y-p1.y, p2.z-p1.z};
+	Vector3d xz = {p3.x-p1.x, p3.y-p1.y, p3.z-p1.z};
 	
 	double a = p1.distance(p2);
 	double c = p1.distance(p3);
@@ -265,7 +265,7 @@ bool Face::simpleClassify()
 void Face::rayTraceClassify(Object3D& object)
 {
 	//creating a ray starting starting at the face baricenter going to the normal direction
-	Point3f p0;
+	Point3d p0;
 	p0.x = (v1().x + v2().x + v3().x)/3.0;
 	p0.y = (v1().y + v2().y + v3().y)/3.0;
 	p0.z = (v1().z + v2().z + v3().z)/3.0;
@@ -273,7 +273,7 @@ void Face::rayTraceClassify(Object3D& object)
 	
 	bool success;
 	double dotProduct, distance; 
-	Point3f intersectionPoint;
+	Point3d intersectionPoint;
 	Face closestFace(object.vertices); //construct invalid face
 	double closestDistance; 
 								
@@ -378,11 +378,11 @@ void Face::rayTraceClassify(Object3D& object)
  * @param point to be tested
  * @param true if the face contains the point, false otherwise 
  */	
-bool Face::hasPoint(Point3f& point)
+bool Face::hasPoint(Point3d& point)
 {
 	int result1, result2, result3;
 	bool hasUp, hasDown, hasOn;
-	Vector3f normal = getNormal(); 
+	Vector3d normal = getNormal(); 
 
 	//if x is constant...	
 	if(std::abs(normal.x)>TOL) 
@@ -433,7 +433,7 @@ bool Face::hasPoint(Point3f& point)
  * @param pointLine2 one of the line ends
  * @return position of the point relative to the line - Face::UP, Face::DOWN, Face::ON, Face::NONE 
  */
-int Face::linePositionInX(Point3f point, Point3f pointLine1, Point3f pointLine2)
+int Face::linePositionInX(Point3d point, Point3d pointLine1, Point3d pointLine2)
 {
 	double a, b, z;
 	if((std::abs(pointLine1.y-pointLine2.y)>TOL)&&(((point.y>=pointLine1.y)&&(point.y<=pointLine2.y))||((point.y<=pointLine1.y)&&(point.y>=pointLine2.y))))
@@ -469,7 +469,7 @@ int Face::linePositionInX(Point3f point, Point3f pointLine1, Point3f pointLine2)
  * @return position of the point relative to the line - Face::UP, Face::DOWN, Face::ON, Face::NONE 
  */
 
-int Face::linePositionInY(Point3f point, Point3f pointLine1, Point3f pointLine2)
+int Face::linePositionInY(Point3d point, Point3d pointLine1, Point3d pointLine2)
 {
 	double a, b, z;
 	if((std::abs(pointLine1.x-pointLine2.x)>TOL)&&(((point.x>=pointLine1.x)&&(point.x<=pointLine2.x))||((point.x<=pointLine1.x)&&(point.x>=pointLine2.x))))
@@ -505,7 +505,7 @@ int Face::linePositionInY(Point3f point, Point3f pointLine1, Point3f pointLine2)
  * @return position of the point relative to the line - Face::UP, Face::DOWN, Face::ON, Face::NONE 
  */
 
-int Face::linePositionInZ(Point3f point, Point3f pointLine1, Point3f pointLine2)
+int Face::linePositionInZ(Point3d point, Point3d pointLine1, Point3d pointLine2)
 {
 	double a, b, y;
 	if((std::abs(pointLine1.x-pointLine2.x)>TOL)&&(((point.x>=pointLine1.x)&&(point.x<=pointLine2.x))||((point.x<=pointLine1.x)&&(point.x>=pointLine2.x))))

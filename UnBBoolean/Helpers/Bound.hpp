@@ -2,7 +2,7 @@
 #define __BOUND__
 
 #include<vector>
-#include"Point3f.hpp"
+#include"Point3d.hpp"
 #include<string>
 
 /**
@@ -30,14 +30,14 @@ public:
 	 * @param p2 point relative to the second vertex
 	 * @param p3 point relative to the third vertex
 	 */	
-	Bound(const Point3f& p1, const Point3f& p2, const Point3f& p3);
+	Bound(const Point3d& p1, const Point3d& p2, const Point3d& p3);
 	
 	/**
 	 * Bound constructor for a object 3d
 	 * 
 	 * @param vertices the object vertices
 	 */
-	Bound(const std::vector<Point3f>& vertices);
+	Bound(const std::vector<Point3d>& vertices);
 	
 	/**
 	 * Bound constructor for a object 3d
@@ -78,7 +78,7 @@ private:
 	 * 
 	 * @param vertex vertex to be tested
 	 */
-	void checkVertex(const Point3f& vertex);
+	void checkVertex(const Point3d& vertex);
 
 	/** maximum from the x coordinate */
 	double xMax;

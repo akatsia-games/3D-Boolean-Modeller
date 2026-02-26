@@ -24,8 +24,8 @@
  */
 Line::Line(const Face& face1, const Face& face2)
 {
-	Vector3f normalFace1 = face1.getNormal();
-	Vector3f normalFace2 = face2.getNormal();
+	Vector3d normalFace1 = face1.getNormal();
+	Vector3d normalFace2 = face2.getNormal();
 	
 	//direction: cross product of the faces normals
 	direction = {}; 
@@ -68,7 +68,7 @@ Line::Line(const Face& face1, const Face& face2)
  * @param direction direction ray
  * @param point beginning of the ray
  */
-Line::Line(Vector3f direction, Point3f point)
+Line::Line(Vector3d direction, Point3d point)
 {
 	this->direction = direction;
 	this->point = point;
@@ -118,7 +118,7 @@ std::string Line::toString() const
  * 
  * @return point used to represent the line
  */
-Point3f Line::getPoint() const
+Point3d Line::getPoint() const
 {
 	return point;
 }
@@ -128,7 +128,7 @@ Point3f Line::getPoint() const
  * 
  * @return line direction
  */
-Vector3f Line::getDirection() const
+Vector3d Line::getDirection() const
 {
 	return direction;
 }
@@ -140,7 +140,7 @@ Vector3f Line::getDirection() const
  * 
  * @param point new point
  */
-void Line::setPoint(Point3f point)
+void Line::setPoint(Point3d point)
 {
 	this->point = point;
 }
@@ -150,7 +150,7 @@ void Line::setPoint(Point3f point)
  * 
  * @param direction new direction
  */
-void Line::setDirection(Vector3f direction)
+void Line::setDirection(Vector3d direction)
 {
 	this->direction = direction;
 }
@@ -165,9 +165,9 @@ void Line::setDirection(Vector3f direction)
  * @return points distance. If the point submitted is behind the direction, the 
  * distance is negative 
  */
-double Line::computePointToPointDistance(const Point3f& otherPoint) const
+double Line::computePointToPointDistance(const Point3d& otherPoint) const
 {
-	Vector3f vec = {otherPoint.x - point.x, otherPoint.y - point.y, otherPoint.z - point.z};
+	Vector3d vec = {otherPoint.x - point.x, otherPoint.y - point.y, otherPoint.z - point.z};
 	double distance = vec.length();
 	vec.normalize();
 	if (vec.dot(direction)<0)
@@ -187,14 +187,14 @@ double Line::computePointToPointDistance(const Point3f& otherPoint) const
  * to intersect
  * @return point resulting from the intersection. If the point coundn't be obtained, return null
  */
-Point3f Line::computeLineIntersection(const Line& otherLine) const
+Point3d Line::computeLineIntersection(const Line& otherLine) const
 {
 	//x = x1 + a1*t = x2 + b1*s
 	//y = y1 + a2*t = y2 + b2*s
 	//z = z1 + a3*t = z2 + b3*s
 	
-	Point3f linePoint = otherLine.getPoint(); 
-	Vector3f lineDirection = otherLine.getDirection();
+	Point3d linePoint = otherLine.getPoint(); 
+	Vector3d lineDirection = otherLine.getDirection();
 			
 	double t;
 	if(std::abs(direction.y*lineDirection.x-direction.x*lineDirection.y)>TOL)
@@ -225,7 +225,7 @@ Point3f Line::computeLineIntersection(const Line& otherLine) const
  * @param planePoint a plane point. 
  * @return intersection point. If they don't intersect, return null
  */
-Point3f Line::computePlaneIntersection(const Vector3f& normal, const Point3f& planePoint) const
+Point3d Line::computePlaneIntersection(const Vector3d& normal, const Point3d& planePoint) const
 {
 	//Ax + By + Cz + D = 0
 	//x = x0 + t(x1 � x0)
@@ -259,7 +259,7 @@ Point3f Line::computePlaneIntersection(const Vector3f& normal, const Point3f& pl
 	else
 	{
 		double t = -numerator/denominator;
-		Point3f resultPoint;
+		Point3d resultPoint;
 		resultPoint.x = point.x + t*direction.x; 
 		resultPoint.y = point.y + t*direction.y;
 		resultPoint.z = point.z + t*direction.z;

@@ -4,10 +4,10 @@
 #include<vector>
 #include"Vertex.hpp"
 #include"Face.hpp"
-#include"Bound.hpp"
+#include"UnBBoolean/Helpers/Bound.hpp"
 
 class Solid;
-class Point3f;
+class Point3d;
 class Face;
 class Segment;
 class Colour3f;
@@ -56,27 +56,27 @@ private:
 
 	int addFace(int v1, int v2, int v3, int testedUntil = 0);
 
-	int addVertex(Point3f pos, Colour3f color, int status);
+	int addVertex(Point3d pos, Colour3f color, int status);
 
 	double computeDistance(const Vertex& vertex, const Face& face)const;
 
 	void splitFace(int facePos, Segment& segment1, Segment& segment2, int testedUntil);
 
-	void breakFaceInTwo(int facePos, Point3f newPos, int splitEdge, int testedUntil);
+	void breakFaceInTwo(int facePos, Point3d newPos, int splitEdge, int testedUntil);
 
-	void breakFaceInTwo(int facePos, Point3f newPos, Vertex endVertex, int testedUntil);
+	void breakFaceInTwo(int facePos, Point3d newPos, Vertex endVertex, int testedUntil);
 
-	void breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, int splitEdge, int testedUntil);
+	void breakFaceInThree(int facePos, Point3d newPos1, Point3d newPos2, int splitEdge, int testedUntil);
 
-	void breakFaceInThree(int facePos, Point3f newPos, Vertex endVertex, int testedUntil);
+	void breakFaceInThree(int facePos, Point3d newPos, Vertex endVertex, int testedUntil);
 
-	void breakFaceInThree(int facePos, Point3f newPos1, Point3f newPos2, Vertex startVertex, Vertex endVertex, int testedUntil);
+	void breakFaceInThree(int facePos, Point3d newPos1, Point3d newPos2, Vertex startVertex, Vertex endVertex, int testedUntil);
 
-	void breakFaceInThree(int facePos, Point3f newPos, int testedUntil);
+	void breakFaceInThree(int facePos, Point3d newPos, int testedUntil);
 
-	void breakFaceInFour(int facePos, Point3f newPos1, Point3f newPos2, Vertex endVertex, int testedUntil);
+	void breakFaceInFour(int facePos, Point3d newPos1, Point3d newPos2, Vertex endVertex, int testedUntil);
 
-	void breakFaceInFive(int facePos, Point3f newPos1, Point3f newPos2, int linedVertex, int testedUntil);
+	void breakFaceInFive(int facePos, Point3d newPos1, Point3d newPos2, int linedVertex, int testedUntil);
 
 #ifdef _DEBUG
 	void checkSplit(Face& original, int count);

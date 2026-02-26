@@ -1,4 +1,6 @@
 #include"Solid.hpp"
+#include"Helpers/Vector3d.hpp"
+#include<cmath>
 
 /**
  * Class representing a 3D solid.
@@ -24,7 +26,7 @@ Solid::Solid()
  * @param indices array of indices for a array of vertices
  * @param colors array of colors defining the vertices colors 
  */
-Solid::Solid(std::vector<Point3f>& vertices, std::vector<int>& indices, std::vector<Colour3f>& colors)
+Solid::Solid(std::vector<Point3d>& vertices, std::vector<int>& indices, std::vector<Colour3f>& colors)
 	:Solid()
 {
 	setData(vertices, indices, colors);		
@@ -68,11 +70,11 @@ void Solid::setInitialFeatures()
  * 
  * @return solid vertices
  */	
-const std::vector<Point3f>& Solid::getVertices() const
+const std::vector<Point3d>& Solid::getVertices() const
 {
 	return vertices;
 }
-std::vector<Point3f>& Solid::getVertices()
+std::vector<Point3d>& Solid::getVertices()
 {
 	return vertices;
 }
@@ -115,7 +117,7 @@ bool Solid::isEmpty() const
 }	
 
 
-double Solid::signedTriangleVolume(Point3f p1, Point3f p2, Point3f p3)
+double Solid::signedTriangleVolume(Point3d p1, Point3d p2, Point3d p3)
 {
     double v321 = p3.x*p2.y*p1.z;
     double v231 = p2.x*p3.y*p1.z;
@@ -152,7 +154,7 @@ double Solid::getVolume() const
  * @param indices array of indices for a array of vertices
  * @param colors array of colors defining the vertices colors 
  */
-void Solid::setData(const std::vector<Point3f>& vertices, const std::vector<int>& indices, const std::vector<Colour3f>& colors)
+void Solid::setData(const std::vector<Point3d>& vertices, const std::vector<int>& indices, const std::vector<Colour3f>& colors)
 {
 	this->vertices = vertices;
 	this->colors = colors;
@@ -170,7 +172,7 @@ void Solid::setData(const std::vector<Point3f>& vertices, const std::vector<int>
  * @param indices array of indices for a array of vertices
  * @param color the color of the vertices (the solid color) 
  */
-void Solid::setData(const std::vector<Point3f>& vertices, const std::vector<int>& indices, Colour3f color)
+void Solid::setData(const std::vector<Point3d>& vertices, const std::vector<int>& indices, Colour3f color)
 {
 	std::vector<Colour3f> colors(vertices.size(),color);
 	setData(vertices, indices, colors);
@@ -215,7 +217,7 @@ void Solid::rotate(double dx, double dy)
 	if(dx!=0||dy!=0)
 	{
 		//get mean
-		Point3f mean = getMean();
+		Point3d mean = getMean();
 		
 		double newX, newY, newZ;
 		for(int i=0;i<vertices.size();i++)
@@ -288,7 +290,7 @@ void Solid::scale(double dx, double dy, double dz)
 	defineGeometry();
 }
 
-Vector3f Solid::intersectRay(Vector3f position, Vector3f direction)
+Vector3d Solid::intersectRay(Vector3d position, Vector3d direction)
 {//work in progress
 	if(position.y > 1 != direction.y < 0){
 		return {NAN,NAN,NAN};
@@ -383,9 +385,9 @@ void Solid::write(std::basic_ostream<char>& solidFile) const
  * 
  * @return point representing the mean
  */
-Point3f Solid::getMean()
+Point3d Solid::getMean()
 {
-	Point3f mean({0,0,0});
+	Point3d mean({0,0,0});
 	for(int i=0;i<vertices.size();i++)
 	{
 		mean.x += vertices[i].x;

@@ -87,8 +87,8 @@ Solid BooleanModeller::composeSolid(int faceStatus1, int faceStatus2, int faceSt
 	groupObjectComponents(object1, vertices, indices, colors, faceStatus1, faceStatus2);
 	groupObjectComponents(object2, vertices, indices, colors, faceStatus3, faceStatus3);
 
-	//turn the Vertex vector to Point3f vector
-	std::vector<Point3f> verticesArray(vertices.size());
+	//turn the Vertex vector to Point3d vector
+	std::vector<Point3d> verticesArray(vertices.size());
 	for(int i=0;i<vertices.size();i++)
 	{
 		verticesArray[i] = vertices[i].getPosition();

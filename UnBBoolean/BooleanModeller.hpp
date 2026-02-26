@@ -2,8 +2,8 @@
 #define __BOOLEAN_MODELLER__
 
 #include <vector>
-#include "Point3f.hpp"
-#include "Object3D.hpp"
+#include "Helpers/Point3d.hpp"
+#include "Internal/Object3D.hpp"
 #include "Solid.hpp"
 
 

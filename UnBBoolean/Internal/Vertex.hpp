@@ -3,7 +3,8 @@
 
 #include<string>
 #include<vector>
-#include"Point3f.hpp"
+#include"UnBBoolean/Helpers/Point3d.hpp"
+#include"UnBBoolean/Helpers/Colour3f.hpp"
 
 /** 
  * Represents of a 3d face vertex.
@@ -19,11 +20,11 @@
 class Vertex
 {
 public:
-	Vertex(std::vector<Vertex>& solidVertices, Point3f position, Colour3f color);
+	Vertex(std::vector<Vertex>& solidVertices, Point3d position, Colour3f color);
 	
 	Vertex(std::vector<Vertex>& solidVertices, double x, double y, double z, Colour3f color);
 	
-	Vertex(std::vector<Vertex>& solidVertices, Point3f position, Colour3f color, int status);
+	Vertex(std::vector<Vertex>& solidVertices, Point3d position, Colour3f color, int status);
 	
 	Vertex(std::vector<Vertex>& solidVertices, double x, double y, double z, Colour3f color, int status);
 
@@ -42,7 +43,7 @@ public:
 
 	void setStatus(int status);
 
-	Point3f getPosition() const;
+	Point3d getPosition() const;
 
 	const std::vector<int>& getAdjacentVertices() const;
 

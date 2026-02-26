@@ -1,13 +1,20 @@
 #pragma once
-#include<iostream>
-#include<vector>
+namespace std
+{
+    template<class type>
+    class basic_istream;   
+}
 
-//class to have data in the points for the solid processing
+/*
+EmptyPointData is a class/interface that shows how Solids hold data per vertex
+
+The functions are intentionally not virtual to avoid using the dynamic function dispatcher
+*/
 class EmptyPointData{
-    EmptyPointData();
-    EmptyPointData(const EmptyPointData& other);
-    ~EmptyPointData();
-    inline void read(std::basic_istream<char>& solidFile);
-    inline void write(std::basic_istream<char>& solidFile);
-    inline bool equals(const EmptyPointData& other);
+    EmptyPointData(){}
+    EmptyPointData(const EmptyPointData& other){}
+    ~EmptyPointData(){}
+    inline void read(std::basic_istream<char>& file){}
+    inline void write(std::basic_istream<char>& file){}
+    inline bool equals(const EmptyPointData& other){return true;}
 };

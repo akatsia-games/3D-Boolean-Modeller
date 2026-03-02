@@ -2,6 +2,10 @@
 
 Constructive solid geometry library based on my personal rewrite of the CSG part of the Java tool/library "UnBBoolean"
 
+## Debug visualizer:
+
+The visualizer helps by normalizing and visualizing the split triangles to the face they're split from to show if there were any issues with the face split
+
 ## Optimizations
 
 This version will be using a **Bounding-Box B-tree** to hold the elements of the objects(points and triangles) during calculations

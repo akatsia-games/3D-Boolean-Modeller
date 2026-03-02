@@ -1,6 +1,7 @@
 #include "Segment.hpp"
 #include "Face.hpp"
 #include "Line.hpp"
+#include "UnBBoolean/Helpers/Vector3d.hpp"
 
 /**
  * Represents a line segment resulting from a intersection of a face and a plane.

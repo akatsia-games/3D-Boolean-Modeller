@@ -1,9 +1,9 @@
 #ifndef __VECTOR3D__
 #define __VECTOR3D__
 
-class Point3d;
+#include<string>
 
-class string;
+class Point3d;
 
 class Vector3d
 {

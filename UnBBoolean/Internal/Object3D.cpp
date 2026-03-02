@@ -3,8 +3,9 @@
 
 #include"Object3D.hpp"
 
-#include"Solid.hpp"
-#include"Point3d.hpp"
+#include"UnBBoolean/Solid.hpp"
+#include"UnBBoolean/Helpers/Point3d.hpp"
+#include"UnBBoolean/Helpers/Vector3d.hpp"
 #include"Face.hpp"
 #include"Segment.hpp"
 

@@ -1,4 +1,5 @@
 #include "Bound.hpp"
+#include <cmath>
 
 /**
  * Representation of a bound - the extremes of a 3d component for each coordinate.

@@ -1,7 +1,8 @@
 #ifndef __LINE_HPP__
 #define __LINE_HPP__
 
-#include"Point3d.hpp"
+#include"UnBBoolean/Helpers/Point3d.hpp"
+#include"UnBBoolean/Helpers/Vector3d.hpp"
 #include"Face.hpp"
 #include<string>
 

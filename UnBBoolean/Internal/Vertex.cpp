@@ -1,5 +1,6 @@
 #include "Vertex.hpp"
 #include <algorithm>
+#include <cmath>
 
 /** 
  * Represents of a 3d face vertex.

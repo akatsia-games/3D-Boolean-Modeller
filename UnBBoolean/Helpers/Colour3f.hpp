@@ -1,7 +1,7 @@
 #ifndef __COLOUR3F__
 #define __COLOUR3F__
 
-class basic_istream;   
+#include<iostream>
 
 class Colour3f
 {
